@@ -92,7 +92,10 @@ def get_anime_stats(id):
     }
     for i in tree:
         if i in ANIME:
-            out[ANIME[i]['format']] = out[ANIME[i]['format']] + 1
+            try:
+                out[ANIME[i]['format']] = out[ANIME[i]['format']] + 1
+            except:
+                pass
     del out['NONE']
     _out = out.copy()
     for n,v in out.items():
