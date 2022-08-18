@@ -42,13 +42,17 @@ def get_user_completed(user):
     for i in response:
         i = i['media']
         
-        startDate = time.mktime(
-            datetime(
-                i['startDate']['year'],
-                i['startDate']['month'],
-                i['startDate']['day'],
-            ).timetuple()
-        )
+        try:
+            startDate = time.mktime(
+                datetime(
+                    i['startDate']['year'],
+                    i['startDate']['month'],
+                    i['startDate']['day'],
+                ).timetuple()
+            )
+        except:
+            print(i)
+            startDate = float('inf')
         
         res[str(i['id'])] = {
             'start': startDate,

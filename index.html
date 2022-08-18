@@ -15,8 +15,13 @@
       <script type="text/python">
          from browser import document
          import anilist
+         import traceback
          usr = input("Enter Your AniList Username: ")
-         html_list = anilist.get_user_list(usr)
+         try:
+            html_list = anilist.get_user_list(usr)
+         except Exception as ex:
+            e = traceback.format_exc()
+            html_list = '<h1>An Exception Has Occurred</h1><br><pre><code>' + e + '</code></pre>'
          document['listout'].html = html_list
       </script>
    </body>
