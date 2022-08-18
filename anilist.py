@@ -135,19 +135,20 @@ def create_list():
     ListData = []
     for i in _ANIME:
         ani = get_anime_stats(i)
-        ListData.append(
-            overwrite.get(ani['name'], ani['name']) + ' ' + ' '.join(' '.join([
-                    '',
-                    '|',
-                    str(ani.get('TV', '')) + 'S' if 'TV' in ani else '',
-                    str(ani.get('MOVIE', '')) + 'MOVIE' if 'MOVIE' in ani else '',
-                    str(ani.get('TV_SHORT', '')) + 'SHORT' if 'TV_SHORT' in ani else '',
-                    str(ani.get('OVA', '')) + 'OVA' if 'OVA' in ani else '',
-                    str(ani.get('ONA', '')) + 'ONA' if 'ONA' in ani else '',
-                    str(ani.get('SPECIAL', '')) + 'SPE' if 'SPECIAL' in ani else '',
-                    str(ani.get('MUSIC', '')) + 'MUSIC' if 'MUSIC' in ani else '',
-                ]).split())
-            )
+        if len(ani) > 0:
+            ListData.append(
+                overwrite.get(ani['name'], ani['name']) + ' ' + ' '.join(' '.join([
+                        '',
+                        '|',
+                        str(ani.get('TV', '')) + 'S' if 'TV' in ani else '',
+                        str(ani.get('MOVIE', '')) + 'MOVIE' if 'MOVIE' in ani else '',
+                        str(ani.get('TV_SHORT', '')) + 'SHORT' if 'TV_SHORT' in ani else '',
+                        str(ani.get('OVA', '')) + 'OVA' if 'OVA' in ani else '',
+                        str(ani.get('ONA', '')) + 'ONA' if 'ONA' in ani else '',
+                        str(ani.get('SPECIAL', '')) + 'SPE' if 'SPECIAL' in ani else '',
+                        str(ani.get('MUSIC', '')) + 'MUSIC' if 'MUSIC' in ani else '',
+                    ]).split())
+                )
 
 def process_save_data(user):
     global anime_data, HEADING, sorted_anime_dict, md
@@ -190,10 +191,19 @@ def gen_md():
 
 
 def get_user_list(user):
-    global ANIME
+    global ANIME, md
     ANIME = get_user_completed(user)
     process_overwrite()
     create_list()
     process_save_data(user)
     gen_md()
+    url = f'https://img.shields.io/badge/@{user}-Anime%20Watched-blueviolet?link=https://roamingcookie.github.io/?user={user}&style=for-the-badge&logoWidth=20&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAACXBIWXMAAAsSAAALEgHS3X78AAABCFBMVEVHcEz8/f4Eqf4Dqf7///7+/v7+/v4CqP/+/v79/f3+/v4Apf/q9/4Cqf8Ao/8AqP/+/v7+/v79/f35/P4Eqf4Fqv5uzf4Fqf4CqP/8/f79/f3+/v4CqP8Ao/8BqP8Aov///v77/f7+/v7+/v7y+v79/f0Cqf4Trv4CqP+B0/4Cqf4Ap/8AqP////7+/v7+/v7+/v79/f39/f79/f0Apf8AqP8ZsP5ty/4LrP73+/7+/v7g8/79/f0Apv/d8/77/f4Ajv8Ao//5/P7+/v4Fqv74/P6Z2/79/f35/P7///37/f3///1Bvv79/f0Aif/7/f7///8FvP8Aqv9Oyf81vf/+//+F1//X9f/JT/BYAAAAUHRSTlMAAQIBAgMBAQICGgEBFQIBOkgDAiApAjWSGQUpdjICJTS/Le4b1/ElAzPo2BE3Eot+Af438vAkB+Am0N/QJfvpMfDx0fEN8bpt8c377+EhLfyOTzcAAACSSURBVAjXY2AAAkYWHm5mBlxAUkFFXpQfzlUMsDZVE2FgB7E5GZSMAkJDTNQhXFYGgwAn7zBHMwiXwdAqwMMz3MWWQQOs1jjA1985wMcPLCfEoB8AAm4O5jpyQL6UaoCNu1eAnYW2lgyQKxigrMfgah8QHBQoAeRyCUgDTbfU1ZQV58V0IRsHB5AUZhHjY2JnAABRiROEPw2AbwAAAABJRU5ErkJggg=='
+    md = md + f'''
+    <br><br>
+    <h1>Put These inside Your AniList Bio's</h1>
+    <pre><code>[![@{user}]({url})](https://roamingcookie.github.io/?user={user})</code></pre>
+    <a href="https://roamingcookie.github.io/?user={user}"><img src={url}></a>
+    <br>
+    or create your own by using any other image with this link <a href="https://roamingcookie.github.io/?user={user}">https://roamingcookie.github.io/?user={user}</a>
+    '''
     return md
