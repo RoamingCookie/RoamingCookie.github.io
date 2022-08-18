@@ -26,7 +26,7 @@
       display: block;
       margin-left: auto;
       margin-right: auto;
-      margin-top: 10%;
+      margin-top: 10vh;
       width: 100%;
     }
 
@@ -125,9 +125,24 @@
                 html_list = '<h1>An Exception Has Occurred</h1><br><pre><code>' + e + '</code></pre>'
              document['listout'].html = html_list
              
+         def get_it_done_3():
+             usr = str(document.query['user'])
+             try:
+                html_list = anilist.get_user_list(usr)
+             except Exception as ex:
+                e = traceback.format_exc()
+                html_list = '<h1>An Exception Has Occurred</h1><br><pre><code>' + e + '</code></pre>'
+             document['listout'].html = html_list
+             
+             
          def get_it_done_0(ev):
              get_it_done_1()
-             get_it_done_2()
+             timer.set_timeout(get_it_done_2, 1000)
+         
+         if 'user' in document.query:
+             usr = str(document.query['user'])
+             document['listout'].html = f'<h1>@{usr} Data Loading...</h1>'
+             timer.set_timeout(get_it_done_3, 1000)
              
          document["TheButton"].bind("click", get_it_done_0)
       
