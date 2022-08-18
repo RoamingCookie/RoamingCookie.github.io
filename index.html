@@ -26,6 +26,7 @@
       display: block;
       margin-left: auto;
       margin-right: auto;
+      margin-top: 10%;
       width: 100%;
     }
 
@@ -113,8 +114,7 @@
          from browser import timer
          import traceback
          def get_it_done_1():
-             document['listout'].html = f'
-						<h1>User Data Loading...</h1>'
+             document['listout'].html = f'<h1>User Data Loading...</h1>'
              
          def get_it_done_2():
              usr = input("Enter Your AniList Username: ")
@@ -122,12 +122,7 @@
                 html_list = anilist.get_user_list(usr)
              except Exception as ex:
                 e = traceback.format_exc()
-                html_list = '
-						<h1>An Exception Has Occurred</h1>
-						<br>
-							<pre>
-								<code>' + e + '</code>
-							</pre>'
+                html_list = '<h1>An Exception Has Occurred</h1><br><pre><code>' + e + '</code></pre>'
              document['listout'].html = html_list
              
          def get_it_done_0(ev):
