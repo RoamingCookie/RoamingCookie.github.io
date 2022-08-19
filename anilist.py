@@ -51,7 +51,6 @@ def get_user_completed(user):
                 ).timetuple()
             )
         except:
-            print(i)
             startDate = float('inf')
         
         res[str(i['id'])] = {
@@ -135,20 +134,20 @@ def create_list():
     ListData = []
     for i in _ANIME:
         ani = get_anime_stats(i)
-        if len(ani) > 0:
-            ListData.append(
-                overwrite.get(ani['name'], ani['name']) + ' ' + ' '.join(' '.join([
-                        '',
-                        '|',
-                        str(ani.get('TV', '')) + 'S' if 'TV' in ani else '',
-                        str(ani.get('MOVIE', '')) + 'MOVIE' if 'MOVIE' in ani else '',
-                        str(ani.get('TV_SHORT', '')) + 'SHORT' if 'TV_SHORT' in ani else '',
-                        str(ani.get('OVA', '')) + 'OVA' if 'OVA' in ani else '',
-                        str(ani.get('ONA', '')) + 'ONA' if 'ONA' in ani else '',
-                        str(ani.get('SPECIAL', '')) + 'SPE' if 'SPECIAL' in ani else '',
-                        str(ani.get('MUSIC', '')) + 'MUSIC' if 'MUSIC' in ani else '',
-                    ]).split())
-                )
+        sdata = ' '.join([
+                '',
+                '|',
+                str(ani.get('TV', '')) + 'S' if 'TV' in ani else '',
+                str(ani.get('MOVIE', '')) + 'MOVIE' if 'MOVIE' in ani else '',
+                str(ani.get('TV_SHORT', '')) + 'SHORT' if 'TV_SHORT' in ani else '',
+                str(ani.get('OVA', '')) + 'OVA' if 'OVA' in ani else '',
+                str(ani.get('ONA', '')) + 'ONA' if 'ONA' in ani else '',
+                str(ani.get('SPECIAL', '')) + 'SPE' if 'SPECIAL' in ani else '',
+                str(ani.get('MUSIC', '')) + 'MUSIC' if 'MUSIC' in ani else '',
+            ]).split()
+        data = overwrite.get(ani['name'], ani['name']) + ' ' + ' '.join(sdata)
+        if len(sdata) > 1:
+            ListData.append(data)
 
 def process_save_data(user):
     global anime_data, HEADING, sorted_anime_dict, md
