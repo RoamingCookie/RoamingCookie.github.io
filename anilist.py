@@ -1,11 +1,31 @@
 import time
 from browser import ajax
 from datetime import datetime
+import sys
+from browser import document
+
+def cprint(string):
+    console = document["console"]
+    out = console.html + '<br><pre><code>' + str(string) + '</code></pre>'
+    console.html += out
 
 ANIME = []
 
-def get_user_completed(user):
-    query = '''query($page:Int,$userName:String){Page(page:$page){pageInfo{total perPage currentPage lastPage hasNextPage}mediaList(userName:$userName,status:COMPLETED){media{id startDate{year month day}title{romaji english}format episodes relations{nodes{id format}edges{relationType node{id format}}}}}}}'''
+def catbox(url):
+    out = []
+    response_g = ajax.post(
+        'https://catbox.moe/user/api.php',
+        blocking=True,
+        data={
+            'reqtype': 'urlupload',
+            'url': url,
+            },
+        oncomplete=out.append
+    )
+    return out[-1].text
+
+def get_user_completed(user, stat='COMPLETED'):
+    query = '''query($page:Int,$userName:String){Page(page:$page){pageInfo{total perPage currentPage lastPage hasNextPage}mediaList(userName:$userName,status:''' + stat + '''){media{id startDate{year month day}title{romaji english}format episodes relations{nodes{id format}edges{relationType node{id format}}}}}}}'''
     resx = []
     response_g = ajax.post(
         'https://graphql.anilist.co',
@@ -191,12 +211,16 @@ def gen_md():
 
 def get_user_list(user):
     global ANIME, md
-    ANIME = get_user_completed(user)
+    ANIME = {}
+    ANIME.update(get_user_completed(user), stat='COMPLETED')
+    ANIME.update(get_user_completed(user, stat='REPEATING'))
+    del ANIME['stat']
     process_overwrite()
     create_list()
     process_save_data(user)
     gen_md()
-    url = f'https://img.shields.io/badge/@{user}-Anime%20Watched-blueviolet?link=https://roamingcookie.github.io/?user={user}&style=for-the-badge&logoWidth=20&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAACXBIWXMAAAsSAAALEgHS3X78AAABCFBMVEVHcEz8/f4Eqf4Dqf7///7+/v7+/v4CqP/+/v79/f3+/v4Apf/q9/4Cqf8Ao/8AqP/+/v7+/v79/f35/P4Eqf4Fqv5uzf4Fqf4CqP/8/f79/f3+/v4CqP8Ao/8BqP8Aov///v77/f7+/v7+/v7y+v79/f0Cqf4Trv4CqP+B0/4Cqf4Ap/8AqP////7+/v7+/v7+/v79/f39/f79/f0Apf8AqP8ZsP5ty/4LrP73+/7+/v7g8/79/f0Apv/d8/77/f4Ajv8Ao//5/P7+/v4Fqv74/P6Z2/79/f35/P7///37/f3///1Bvv79/f0Aif/7/f7///8FvP8Aqv9Oyf81vf/+//+F1//X9f/JT/BYAAAAUHRSTlMAAQIBAgMBAQICGgEBFQIBOkgDAiApAjWSGQUpdjICJTS/Le4b1/ElAzPo2BE3Eot+Af438vAkB+Am0N/QJfvpMfDx0fEN8bpt8c377+EhLfyOTzcAAACSSURBVAjXY2AAAkYWHm5mBlxAUkFFXpQfzlUMsDZVE2FgB7E5GZSMAkJDTNQhXFYGgwAn7zBHMwiXwdAqwMMz3MWWQQOs1jjA1985wMcPLCfEoB8AAm4O5jpyQL6UaoCNu1eAnYW2lgyQKxigrMfgah8QHBQoAeRyCUgDTbfU1ZQV58V0IRsHB5AUZhHjY2JnAABRiROEPw2AbwAAAABJRU5ErkJggg=='
+    url = f'https://raster.shields.io/badge/@{user}-Anime%20Watched-blueviolet?link=https://roamingcookie.github.io/?user={user}&style=for-the-badge&logoWidth=20&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAACXBIWXMAAAsSAAALEgHS3X78AAABCFBMVEVHcEz8/f4Eqf4Dqf7///7+/v7+/v4CqP/+/v79/f3+/v4Apf/q9/4Cqf8Ao/8AqP/+/v7+/v79/f35/P4Eqf4Fqv5uzf4Fqf4CqP/8/f79/f3+/v4CqP8Ao/8BqP8Aov///v77/f7+/v7+/v7y+v79/f0Cqf4Trv4CqP+B0/4Cqf4Ap/8AqP////7+/v7+/v7+/v79/f39/f79/f0Apf8AqP8ZsP5ty/4LrP73+/7+/v7g8/79/f0Apv/d8/77/f4Ajv8Ao//5/P7+/v4Fqv74/P6Z2/79/f35/P7///37/f3///1Bvv79/f0Aif/7/f7///8FvP8Aqv9Oyf81vf/+//+F1//X9f/JT/BYAAAAUHRSTlMAAQIBAgMBAQICGgEBFQIBOkgDAiApAjWSGQUpdjICJTS/Le4b1/ElAzPo2BE3Eot+Af438vAkB+Am0N/QJfvpMfDx0fEN8bpt8c377+EhLfyOTzcAAACSSURBVAjXY2AAAkYWHm5mBlxAUkFFXpQfzlUMsDZVE2FgB7E5GZSMAkJDTNQhXFYGgwAn7zBHMwiXwdAqwMMz3MWWQQOs1jjA1985wMcPLCfEoB8AAm4O5jpyQL6UaoCNu1eAnYW2lgyQKxigrMfgah8QHBQoAeRyCUgDTbfU1ZQV58V0IRsHB5AUZhHjY2JnAABRiROEPw2AbwAAAABJRU5ErkJggg=='
+    url = catbox(url)
     md = md + f'''
     <br><br>
     <h1>Put These inside Your AniList Bio's</h1>
