@@ -14,10 +14,10 @@ ANIME = []
 def catbox(url):
     out = []
     response_g = ajax.post(
-        'https://catbox.moe/user/api.php',
+        'https://is.gd/create.php',
         blocking=True,
         data={
-            'reqtype': 'urlupload',
+            'format': 'simple',
             'url': url,
             },
         oncomplete=out.append
