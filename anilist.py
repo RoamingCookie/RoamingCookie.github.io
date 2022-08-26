@@ -208,7 +208,7 @@ def get_user_list(user):
     process_save_data(user)
     gen_md()
     
-    url = f'https://img.shields.io/endpoint?url=https%3A%2F%2Flolicegeneralai.pythonanywhere.com%2FAnimeCount%2F{user}'
+    url = f'https://lolicegeneralai.pythonanywhere.com/AnimeCount/{user}'
     md = md + f'''
     <br><br>
     <h1>Put These inside Your AniList Bio's</h1>
