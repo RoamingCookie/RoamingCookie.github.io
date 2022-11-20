@@ -349,11 +349,12 @@ def err(e):
 def sync_server(data):
     ajax.post(
         f'https://roamingcookie.pythonanywhere.com/update/{data["USER"]["id"]}',
-        data=json.dumps({data["USER"]["id"]: data['CARD'].values()}),
+        data=json.dumps({data["USER"]["id"]: list(data['CARD'].values())}),
         headers={
             'UserID': str(data["USER"]["id"]), 
             'Content-type':'application/json',
-        }
+        },
+        oncomplete=err
     )
 
 
