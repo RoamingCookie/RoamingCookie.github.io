@@ -346,12 +346,14 @@ def err(e):
     document['listout'] <= html.H1('An Exception Has Occurred...') + html.PRE(html.CODE(e))
     return None
 
-def sync_server(data, response):
+def sync_server(data):
     ajax.post(
         f'https://roamingcookie.pythonanywhere.com/update/{data["USER"]["id"]}',
-        data=json.dumps(data['USER']),
-        headers={'UserID':str(data["USER"]["id"]), 'Content-type':'application/json'}
-        #oncomplete=lambda response, data=data: sync_server(data, response),
+        data=json.dumps({data["USER"]["id"]: data['CARD'].values()}),
+        headers={
+            'UserID': str(data["USER"]["id"]), 
+            'Content-type':'application/json',
+        }
     )
 
 
@@ -368,7 +370,7 @@ def main_handle(event, userName=None):
 
         if userName is not None:
             user = userName
-            document["username-input-box"].value = '@' + user
+            document["username-input-box"].value = ('@' if not userName.startswith('#') else '') + user
         else:
             user = document["username-input-box"].value.strip()
 
@@ -399,17 +401,10 @@ def display(event):
 
         if 'ERROR' in data:
             return err(data['ERROR'])
-
+        
+        sync_server(data)
+        
         dump = HTML(data)
-
-        ajax.post(
-            'https://jsonhero.io/api/create.json',
-            data={
-                'title': f'{data["USER"]["name"]} - {time.time()}.json',
-                'content': json.dumps(data),
-            },
-            oncomplete=lambda response, data=data: sync_server(data, response),
-        )
 
         document['listout'] <= html.DIV(dump.dump_data())
         dump.bind_modal()

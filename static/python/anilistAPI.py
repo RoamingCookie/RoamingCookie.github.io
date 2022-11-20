@@ -409,23 +409,40 @@ def GetUserInfo(user):
     proc_out = relation_gen.process(tree_out)
     anime_proc = text_process.display_data(proc_out, list(anime_out), stopped)
 
-    return {
-        'USER': {
-            'id': user_info['id'],
-            'name': user_info['name'],
-            'url': user_info['siteUrl'],
-            'avatar': user_info['avatar']['large'],
-            'count': {
-                'anime': len(anime_proc),
-                'unwatch': text_process.unwatch_stat(anime_proc),
-                'title': user_info['statistics']['anime']['count'],
-                'episode': user_info['statistics']['anime']['episodesWatched'],
-                'time': (lambda min: {'formated': str(round(min / (60 if min < (24 * 60) else 60 * 24), 1)) + (" Hour's" if min < (24 * 60) else " Day's"), 'raw': min})(user_info["statistics"]["anime"]["minutesWatched"]),
-            },
+    output = {}
+    
+    output['USER'] = {
+        'id': user_info['id'],
+        'name': user_info['name'],
+        'url': user_info['siteUrl'],
+        'avatar': user_info['avatar']['large'],
+        'count': {
+            'anime': len(anime_proc),
+            'unwatch': text_process.unwatch_stat(anime_proc),
+            'title': user_info['statistics']['anime']['count'],
+            'episode': user_info['statistics']['anime']['episodesWatched'],
+            'time': (lambda min: {'formated': str(round(min / (60 if min < (24 * 60) else 60 * 24), 1)) + (" Hour's" if min < (24 * 60) else " Day's"), 'raw': min})(user_info["statistics"]["anime"]["minutesWatched"]),
         },
-        'DATA': anime_proc,
-        'CACHE': TMP_CACHE,
-    }, True
+    }
+    output['DATA'] = anime_proc
+    output['CACHE'] = TMP_CACHE
+    output['CARD'] = {
+        'UserId': output['USER']['id'],
+        'UserName': output['USER']['name'],
+        'UserSiteUrl': output['USER']['url'],
+        'UserAvatar': output['USER']['avatar'],
+        'AnimeWatched': output['USER']['count']['anime'],
+        'TitleWatched': output['USER']['count']['title'],
+        'EpisodeWatched': output['USER']['count']['episode'],
+        'MinutesWatched': output['USER']['count']['time']['raw'],
+        'WatchTime': output['USER']['count']['time']['formated'],
+        'UnwatchDropped': output['USER']['count']['unwatch']['dropped'],
+        'UnwatchNotReleased': output['USER']['count']['unwatch']['notReleased'],
+        'UnwatchAiring': output['USER']['count']['unwatch']['airing'],
+        'UnwatchPlausible': output['USER']['count']['unwatch']['willWatch'],
+        'TotalUnwatch': output['USER']['count']['unwatch']['total'],
+    }
+    return output, True
 
 
 def main(event):
