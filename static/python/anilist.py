@@ -349,7 +349,7 @@ def err(e):
 def sync_server(data, response):
     ajax.post(
         f'https://roamingcookie.pythonanywhere.com/update/{data["USER"]["id"]}',
-        data=data['USER'],
+        data=json.dumps(data['USER']),
         headers={'UserID':str(data["USER"]["id"]), 'Content-type':'application/json'}
         #oncomplete=lambda response, data=data: sync_server(data, response),
     )
@@ -406,7 +406,7 @@ def display(event):
             'https://jsonhero.io/api/create.json',
             data={
                 'title': f'{data["USER"]["name"]} - {time.time()}.json',
-                'content': data,
+                'content': json.dumps(data),
             },
             oncomplete=lambda response, data=data: sync_server(data, response),
         )

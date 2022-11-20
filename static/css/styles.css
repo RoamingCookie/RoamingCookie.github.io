@@ -534,9 +534,15 @@ input:-moz-placeholder {
 }
 
 .cookielist {
-  padding-top: 50%;
+  padding-top: 10%;
   width: 80%;
   margin-left: 10%;
+}
+
+@media (max-width: 767px) {
+  .cookielist {
+    padding-top: 50%;
+  }
 }
 
 a:hover {
