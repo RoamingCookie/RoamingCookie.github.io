@@ -1,0 +1,20 @@
+query ($page: Int, $animeList: [Int]) {
+  Page(page: $page) {
+    pageInfo {
+      hasNextPage
+    }
+    media(id_in: $animeList) {
+      id
+      format
+      relations {
+        edges {
+          relationType(version: 2)
+          node {
+            id
+            format
+          }
+        }
+      }
+    }
+  }
+}

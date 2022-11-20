@@ -1,0 +1,100 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="/static/javascript/brython.js"></script>
+    <script type="text/javascript" src="/static/javascript/brython_stdlib.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="/static/css/github_markdown.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+    <link rel="stylesheet" href="" id="custom-css">
+
+    <title>CookieList - @RoamingCookie</title>
+</head>
+
+<body id="body" onload="brython()">
+
+    <div id="load-content" class="load-content markdown-body">
+        <div class="lds-ripple">
+            <div></div>
+            <div></div>
+        </div>
+        <h1>Initializing...</h1>
+    </div>
+
+    <div id="main-content" class="main-content">
+        <div class="input-div">
+            <input class="button-30" id="username-input-box" placeholder="AniList Username"></input>
+            <button class="button-30" id="username-input-button"><img src="/static/image/search.png"></button>
+            <button class="button-30" id="settings-button"><img src="/static/image/settings.png"></button>
+        </div>
+        <div id="settings-window" class="modal markdown-body settings-window">
+            <div class='modal-content'>
+                <h1>Settings...</h1>
+                <h6>AniList API Key</h6>
+                <input class="button-30 api-input" id="login-key-box" placeholder="AniList API key"></input>
+
+                <div id="login-key-button" class="api-login-div"><img class="api-login" src="/static/image/anilist.png">
+                </div>
+                <br>
+                <h6>User Experience</h6>
+
+
+                <label class="setting-container">Background Music
+                    <input value="ux:music" id="settings-ux-music" type="checkbox">
+                    <span class="setting-checkmark"></span>
+                </label>
+
+                <label class="setting-container">Custom CSS
+                    <input value="ux:css" id="settings-ux-css" type="checkbox">
+                    <span class="setting-checkmark"></span>
+                </label>
+
+                <h6>Memes</h6>
+                <label class="setting-container">NSFW
+                    <input value="meme:nsfw" id="settings-meme-nsfw" type="checkbox">
+                    <span class="setting-checkmark"></span>
+                </label>
+
+                <label class="setting-container">SPOILER
+                    <input value="meme:spoiler" id="settings-meme-spoiler" type="checkbox">
+                    <span class="setting-checkmark"></span>
+                </label>
+
+                <button class="button-30 settings-window-button" id="settings-close">CLOSE</button>
+                <button class="button-30 settings-window-button" id="settings-save">SAVE</button>
+            </div>
+        </div>
+        <br><br><br>
+
+        <div class="memes markdown-body" id="memes">
+            <img class="meme-toggle" id="meme-toggle-previous" src="/static/image/previous.png">
+            <span class="meme-link" id="meme-link" href="">
+                <h4 class="meme-title" id="meme-title"></h4>
+                <img class="meme-image" id="meme-image" src="">
+            </span>
+            <img class="meme-toggle" id="meme-toggle-next" src="/static/image/next.png">
+        </div>
+
+        <article class="markdown-body" id="listout">
+
+            <img src="/static/image/cookielist.png" class="cookielist">
+
+
+        </article>
+
+
+        <audio id="music-player" autoplay>
+            <source id="music-source" src="/static/audio/music.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script type="text/python" class="webworker" id="AniListWorker" src="/static/python/anilistAPI.py"></script>
+    <script type="text/python" src="/static/python/anilist.py"></script>
+
+</body>
+
+</html>

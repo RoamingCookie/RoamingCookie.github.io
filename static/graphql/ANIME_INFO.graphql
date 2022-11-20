@@ -1,0 +1,25 @@
+query ($page: Int, $animeList: [Int]) {
+  Page(page: $page) {
+    pageInfo {
+      hasNextPage
+    }
+    media(id_in: $animeList) {
+      id
+      format
+      status(version: 2)
+      startDate {
+        year
+        month
+        day
+      }
+      title {
+        romaji
+        english
+      }
+      coverImage {
+        large
+      }
+      siteUrl
+    }
+  }
+}

@@ -1,0 +1,42 @@
+query ($userId: Int, $userName: String, $type: MediaType) {
+  MediaListCollection(userId: $userId, userName: $userName, type: $type, forceSingleCompletedList: true) {
+    lists {
+      name
+      status
+      entries {
+        ...mediaListEntry
+      }
+    }
+    user {
+      id
+      name
+      siteUrl
+      statistics {
+        anime {
+          count
+          minutesWatched
+          episodesWatched
+        }
+      }
+      avatar {
+        large
+      }
+    }
+  }
+}
+
+fragment mediaListEntry on MediaList {
+  media {
+    id
+    format
+    relations {
+      edges {
+        relationType
+        node {
+          id
+          format
+        }
+      }
+    }
+  }
+}

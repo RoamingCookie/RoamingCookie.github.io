@@ -1,0 +1,5 @@
+query ($userId: Int) {
+  User(id: $userId) {
+    name
+  }
+}
