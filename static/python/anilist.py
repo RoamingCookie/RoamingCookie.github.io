@@ -214,7 +214,7 @@ class HTML:
           + html.TD(html.B('Count')),
         )
         yield html.TR(
-            html.TD('Dropped')
+            html.TD('Dropped/Paused')
           + html.TD(self.data['CARD']['UnwatchDropped']),
         )
         yield html.TR(
