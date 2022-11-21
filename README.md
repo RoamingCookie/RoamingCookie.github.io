@@ -7,6 +7,8 @@ which are updated live every time you visit the [site](https://roamingcookie.git
 
 > not afiliated with AniList in any way
 
+# Screenshot's
+[screenshots](screenshots/README.md)
 
 # license MIT
 
