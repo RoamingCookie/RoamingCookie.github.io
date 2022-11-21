@@ -140,7 +140,7 @@ class HTML:
           + html.TD(html.CODE('processing...', Id='time-taken')),
         )
         yield html.TR(
-            html.TD(html.B('Data Send To Server')) 
+            html.TD(html.B('Data Sent To Server')) 
           + html.TD(html.BUTTON('Click To View', Class='button-30', Id='server-data-view')),
         )
         yield html.TR(
@@ -150,6 +150,10 @@ class HTML:
         yield html.TR(
             html.TD(html.B('Data At Server')) 
           + html.TD(html.BUTTON('View in JsonHero', Class='button-30', Id='live-server-data-view')),
+        )
+        yield html.TR(
+            html.TD(html.B('Additional Relation Rule File')) 
+          + html.TD(html.BUTTON('Click To View', Class='button-30', Id='relation-rule-data-view')),
         )
         
     def dump_data(self):
@@ -254,6 +258,7 @@ class HTML:
         window.bind('click', fn_win_modal_close)
         
         document['server-data-view'].bind('click', lambda e, data={str(self.data['USER']['id']): list(self.data['CARD'].values())}: pop_json(data))
+        document['relation-rule-data-view'].bind('click', lambda e, data={'Rules': CUSTOM}: pop_json(data))
         document['live-server-data-view'].bind('click', lambda e: window.open(f"https://roamingcookie.pythonanywhere.com/view/{self.data['USER']['id']}", '_blank').focus())
         document['data-view'].bind('click', lambda e, data=self.data: pop_json(data))
 
