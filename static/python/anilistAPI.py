@@ -9,7 +9,7 @@ try:
     from browser import ajax
     from browser import self as window
     WEB = True
-    CACHE = False
+    CACHE = 0
 except:
     import requests
     WEB = False
@@ -135,7 +135,7 @@ class Graphql:
                 oncomplete=tempResponse.append
             )
             response = tempResponse[-1].json
-            if 'errors' not in response and CACHE >= 1 and response['data'] is not None:
+            if 'errors' not in response and CACHE >= 1 and response['data'] is not None and CACHE != 0:
                 TMP_CACHE[f'{cache_iD}.time'] = time.time()
                 TMP_CACHE[f'{cache_iD}.data'] = str(response)
             return response

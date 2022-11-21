@@ -3,6 +3,7 @@ import os
 import random
 import time
 import traceback
+import javascript
 
 from browser import ajax, bind, document, html, timer, window, worker
 from browser.local_storage import storage
@@ -17,7 +18,13 @@ class HTML:
             if cache_id != 'SETTINGS':
                 storage[cache_id] = json.dumps(cache_data) if isinstance(
                     cache_data, str) else cache_data
-
+        
+        for cache_id, cache_data in data['CACHE'].items():
+            try:
+                data['CACHE'][cache_id] = json.loads(data['CACHE'][cache_id])
+            except Exception:
+                pass
+            
         dictionary = ('0', list('abcdefghijklmnopqrstuvwxyz'))
         self.anime = {key.upper(): dict()
                       for key in [dictionary[0]] + dictionary[1]}
@@ -26,10 +33,13 @@ class HTML:
             if not title_key in self.anime:
                 title_key = dictionary[0]
             self.anime[title_key][iD] = media
+            
         for key, value in self.anime.copy().items():
             if not value:
                 del self.anime[key]
-
+            else:
+                self.anime[key] = dict(sorted(value.items(), key=lambda k: k[1][k[0]]['title'].lower()))
+                
     def code_status(self, extra_data):
         if not extra_data['completed'] and extra_data['available'] and not extra_data['willWatch'] and extra_data['outThere']:
             return 'code-blue'
@@ -78,13 +88,148 @@ class HTML:
             )
             if key != lkey:
                 yield html.SPAN(html.BR(), Class='br-span')
-
+    
+    def unwatch(self):
+        yield html.TR(
+            html.TD(html.B('Anime Title'))
+          + html.TD(html.B('Format/Status'))
+          + html.TD(html.B('ID')),
+        )
+        
+        media_s = []
+        for series in self.data['DATA'].values():
+            for media in series.values():
+                media_s.append(media)
+        
+        media_s = sorted(media_s, key=lambda k: k['title'])
+        for media in media_s:
+            if not media['watched']:
+                yield html.TR(
+                    html.TD(
+                        html.A(
+                            media['title'],
+                            href=media['url'],
+                            target='_blank',
+                        ),
+                    )
+                  + html.TD(
+                        html.CODE(
+                            media['format'],
+                            Class='unwatch-' + self.gscolor(media),
+                        )
+                    )
+                  + html.TD(
+                        html.CODE(
+                            media['id'],
+                        )
+                    ),
+                )
+    
+    def misc_out(self):
+        yield html.TR(
+            html.TD(html.B('User Name')) 
+          + html.TD(html.CODE('@' + self.data['USER']['name'])),
+        )
+        yield html.TR(
+            html.TD(html.B('User ID')) 
+          + html.TD(html.CODE('#' + str(self.data['USER']['id']))),
+        )
+        yield html.TR(
+            html.TD(html.B('Time Taken To Process')) 
+          + html.TD(html.CODE('processing...', Id='time-taken')),
+        )
+        yield html.TR(
+            html.TD(html.B('Data Send To Server')) 
+          + html.TD(html.BUTTON('Click To View', Class='button-30', Id='server-data-view')),
+        )
+        yield html.TR(
+            html.TD(html.B('Raw Processed Data')) 
+          + html.TD(html.BUTTON('Click To View', Class='button-30', Id='data-view')),
+        )
+        yield html.TR(
+            html.TD(html.B('Data At Server')) 
+          + html.TD(html.BUTTON('View in JsonHero', Class='button-30', Id='live-server-data-view')),
+        )
+        
     def dump_data(self):
         yield self.listout_header()
+        yield html.DIV(html.H1(f"@{self.data['USER']['name']} Watched {self.data['USER']['count']['anime']} Anime"), Class="output")
+        yield html.BR()
         yield html.DIV(self.stat_out(), Class="stats")
         yield html.BR()
         yield html.DIV(self.list_out(), Class="output")
+        yield html.BR()
+        yield html.TABLE(self.misc_out(), Class="output misc-data")
+        yield html.BR()
+        yield html.TABLE(self.unwatch_out(), Class="output")
+        yield html.BR()
+        yield html.TABLE(self.unwatch(), Class="output unwatch-list")
+        yield html.BR()
+        yield html.DIV(self.badge_out(), Class="output")
+        yield html.BR()
+        yield html.CENTER(
+            html.IMG(src="/static/image/made-with-python.svg")
+          + html.BR()
+          + html.IMG(src="/static/image/uses-html.svg")
+          + html.IMG(src="/static/image/uses-css.svg")
+          + html.IMG(src="/static/image/uses-js.svg")
+          + html.BR()
+          + html.IMG(src="/static/image/powered-by-electricity.svg"),
+            Id='badge',
+        )
+        
+    def badge_out(self):
+        badge_url = f"https://roamingcookie.pythonanywhere.com/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}{window.location.search}"
+        current_url = f'https://roamingcookie.github.io/{window.location.search}'
+        
+        html_code = f'''
+        <a href="{current_url}"><img src="{badge_url}" alt="@{self.data['USER']['name']} Badge"></a>
+        '''.strip()
 
+        md_code = f'''
+        [![@{self.data['USER']['name']} Badge]({badge_url})]({current_url})
+        '''.strip()
+
+        html_code_element = html.CODE()
+        html_code_element.text = html_code
+
+        md_code_element = html.CODE()
+        md_code_element.text = md_code
+        
+        yield html.CENTER(html.IMG(src=badge_url, Id='badge-image'))
+
+        yield html.H6('Markdown') + html.PRE(md_code_element, Id='md-code')
+
+        yield html.H6('HTML') + html.PRE(html_code_element, Id='html-code')
+
+        yield html.CENTER(html.A('CUSTOMIZE', href='/docs/badge_api'))
+        
+    def unwatch_out(self):
+        yield html.TR(
+            html.TD(html.B('Unwatched Anime'))
+          + html.TD(html.B('Count')),
+        )
+        yield html.TR(
+            html.TD('Dropped')
+          + html.TD(self.data['CARD']['UnwatchDropped']),
+        )
+        yield html.TR(
+            html.TD('Not Released')
+          + html.TD(self.data['CARD']['UnwatchNotReleased']),
+        )
+        yield html.TR(
+            html.TD('Airing')
+          + html.TD(self.data['CARD']['UnwatchAiring']),
+        )
+        yield html.TR(
+            html.TD('Plausible')
+          + html.TD(self.data['CARD']['UnwatchPlausible']),
+        )
+        yield html.TR(
+            html.TD('Total')
+          + html.TD(self.data['CARD']['TotalUnwatch']),
+        )
+    
     def bind_modal(self):
         modal_window = document['modal-window']
         modal_close = document['modal-close']
@@ -103,7 +248,14 @@ class HTML:
         modal_close.bind('click', fn_modal_close)
 
         window.bind('click', fn_win_modal_close)
+        
+        document['server-data-view'].bind('click', lambda e, data={str(self.data['USER']['id']): list(self.data['CARD'].values())}: pop_json(data))
+        document['live-server-data-view'].bind('click', lambda e: window.open(f"https://roamingcookie.pythonanywhere.com/view/{self.data['USER']['id']}", '_blank').focus())
+        document['data-view'].bind('click', lambda e, data=self.data: pop_json(data))
 
+        window.hljs.highlightElement(document['md-code'])
+        window.hljs.highlightElement(document['html-code'])
+        
     def listout_header(self):
         return html.DIV(
             html.DIV(
@@ -240,6 +392,7 @@ def settings(close=False, show=False, save=False, get=True, api_key=False):
 def meme(memes=None, toggle=None, hide=False):
     if hide:
         document['memes'].style.display = 'none'
+        document['meme-tip'].style.display = 'none'
         return None
 
     global CALCULATING, MEME_INDEX
@@ -263,6 +416,7 @@ def meme(memes=None, toggle=None, hide=False):
         document['meme-link'].href = memes[MEME_INDEX][2]
 
         document['memes'].style.display = 'flex'
+        document['meme-tip'].style.display = 'flex'
 
         return None
 
@@ -304,7 +458,7 @@ def meme(memes=None, toggle=None, hide=False):
                 m['preview'][-1],
             )
             for m in memes.json['memes']
-            if check_meme(m['spoiler'], m['nsfw'])
+            if check_meme(m['spoiler'], m['nsfw']) and not m['preview'][-1].startswith('https://i.imgur.com/')
         ]
         MEME_INDEX = 0
 
@@ -347,6 +501,10 @@ def err(e):
     return None
 
 def sync_server(data):
+    def update_badge(response):
+        document['badge-image'].src = ''
+        document['badge-image'].src = f"https://roamingcookie.pythonanywhere.com/{'svg' if 'svg' in document.query else 'badge'}/{data['USER']['id']}{window.location.search}"
+    
     ajax.post(
         f'https://roamingcookie.pythonanywhere.com/update/{data["USER"]["id"]}',
         data=json.dumps({data["USER"]["id"]: list(data['CARD'].values())}),
@@ -354,19 +512,47 @@ def sync_server(data):
             'UserID': str(data["USER"]["id"]), 
             'Content-type':'application/json',
         },
-        oncomplete=err
+        oncomplete=update_badge,
     )
 
+def pop_json(jsond):
+    json_window_modal = document['json-window-modal']
+    json_window_modal.style.display = 'block'
+    json_window = document['json-window']
+    cjson = javascript.JSON.stringify(jsond, javascript.NULL, 4)
+    json_window.html = ''
+    json_window <= html.BUTTON(html.IMG(src='/static/image/close.png'), Class="button-30", Id='close-json')
+    json_window <= html.BUTTON(html.IMG(src='/static/image/copy.png'), Class="button-30", Id='copy-json')
+    json_window <= html.BUTTON(html.IMG(src='/static/image/jsonhero.png'), Class="button-30", Id='view-json') 
+    json_window <= html.BR() + html.BR() 
+    json_window <= html.PRE(html.CODE(cjson), Id='json-code')
+    window.hljs.highlightElement(document['json-code'])
+    
+    def close_json(e):
+        json_window_modal.style.display = 'none'
+    def copy_json(e, js=cjson):
+        window.navigator.clipboard.writeText(js)
+    def view_json(e, js=cjson):
+        window.navigator.clipboard.writeText(js)
+        window.open('https://jsonhero.io/', '_blank').focus()
+    def fn_win_modal_close(event):
+        if event.target == json_window_modal:
+            json_window_modal.style.display = 'none'
+            
+    document['close-json'].bind('click', close_json)
+    document['copy-json'].bind('click', copy_json)
+    document['view-json'].bind('click', view_json)
+    window.bind('click', fn_win_modal_close)
 
 def main_handle(event, userName=None):
     try:
         global start, CALCULATING
-
+    
         document['listout'].html = ''
-
+    
         start = time.time()
         CALCULATING = True
-
+    
         meme()
 
         if userName is not None:
@@ -410,7 +596,7 @@ def display(event):
         document['listout'] <= html.DIV(dump.dump_data())
         dump.bind_modal()
 
-        print('DONE', time.time() - start)
+        document['time-taken'].text = str(round(time.time() - start, 3)) + ' seconds'
     except:
         err(traceback.format_exc())
 
@@ -425,7 +611,6 @@ try:
     document['username-input-box'].bind('keyup', lambda event: main_handle(event) if event.which == 13 else None)
 
     toggle_css()
-
 
     if window.location.hash.startswith('#access_token='):
         token = dict([i.split('=') for i in window.location.hash[1:].split('&')])['access_token']

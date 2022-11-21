@@ -3,18 +3,19 @@
 <head>
     <script type="text/javascript" src="/static/javascript/brython.js"></script>
     <script type="text/javascript" src="/static/javascript/brython_stdlib.js"></script>
+    <script type="text/javascript" src="/static/javascript/highlight.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="/static/css/github_markdown.css">
     <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/highlight.css">
 
     <link rel="stylesheet" href="" id="custom-css">
 
     <title>CookieList - @RoamingCookie</title>
     
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JGSH96M547"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -32,22 +33,29 @@
             <div></div>
             <div></div>
         </div>
-        <h1>Initializing...</h1>
+        <h1>Initializing.</h1>
     </div>
 
     <div id="main-content" class="main-content">
         <div class="input-div">
-            <input class="button-30" id="username-input-box" placeholder="AniList @Username or #UserID"></input>
+            <input class="button-30" id="username-input-box" placeholder="@Username or #UserID" autocomplete="off" value=""></input>
             <button class="button-30" id="username-input-button"><img src="/static/image/search.png"></button>
             <button class="button-30" id="settings-button"><img src="/static/image/settings.png"></button>
         </div>
+        
+        <div id="json-window-modal" class="modal markdown-body settings-window">
+            <div id="json-window" class='modal-content json-window'>
+            
+            </div>
+        </div>
+        
         <div id="settings-window" class="modal markdown-body settings-window">
             <div class='modal-content'>
                 <h1>Settings...</h1>
                 <h6>AniList API Key</h6>
                 <input class="button-30 api-input" id="login-key-box" placeholder="AniList API key"></input>
 
-                <div id="login-key-button" class="api-login-div"><img class="api-login" src="/static/image/anilist.png">
+                <div id="login-key-button" class="api-login-div"><img class="api-login" src="/static/image/anilist.svg">
                 </div>
                 <br>
                 <h6>User Experience</h6>
@@ -76,10 +84,13 @@
 
                 <button class="button-30 settings-window-button" id="settings-close">CLOSE</button>
                 <button class="button-30 settings-window-button" id="settings-save">SAVE</button>
+                <a href="https://anilist.co/user/5636117" target="_blank"><img id="about-button" src="/static/image/avatar.png"></a>
+        
             </div>
         </div>
         <br><br><br>
-
+        
+        
         <div class="memes markdown-body" id="memes">
             <img class="meme-toggle" id="meme-toggle-previous" src="/static/image/previous.png">
             <span class="meme-link" id="meme-link" href="">
@@ -87,6 +98,10 @@
                 <img class="meme-image" id="meme-image" src="">
             </span>
             <img class="meme-toggle" id="meme-toggle-next" src="/static/image/next.png">
+            <br><br>
+        </div>
+        <div id="meme-tip" class="markdown-body">
+        <h6>View Some Memes, Until Processing Is Finished (Its Worth It) (POV: You Dont Know, How To Calculate Or Display ETA)</h6> 
         </div>
 
         <article class="markdown-body" id="listout">
@@ -97,7 +112,7 @@
         </article>
 
 
-        <audio id="music-player" autoplay>
+        <audio id="music-player">
             <source id="music-source" src="/static/audio/music.mp3" type="audio/mpeg">
         </audio>
     </div>

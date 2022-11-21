@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="90" width="200">
+  <text x="10" y="20" style="fill:red;">{& userName &}
+    <tspan x="10" y="45">{& COU NT &}.ggg {& COUNTT &} </tspan>
+  </text>
+</svg>

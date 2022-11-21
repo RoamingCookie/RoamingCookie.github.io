@@ -131,10 +131,31 @@
 
 }
 
+.json-window pre{
+    height: 80%;
+}
+.json-window button{
+    height: 50px;
+    width: 50px;
+    margin-left: 4%;
+    align-self: right;
+}
+.json-window img{
+    width: 35px;
+}
+
 .modal-img {
   margin-left: 7%;
 }
 
+#about-button {
+    width: 50px;
+    margin-bottom: -18px;
+    margin-left: 30px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    border-radius:50%;
+    cursor: pointer;
+}
 
 .close {
   color: #aaaaaa;
@@ -383,6 +404,10 @@ input:-moz-placeholder {
   display: none;
   justify-content: center;
 }
+#meme-tip {
+  display: none;
+  justify-content: center;
+}
 
 .meme-toggle {
   width: 10%;
@@ -447,12 +472,12 @@ input:-moz-placeholder {
 }
 
 .api-login {
-
+  cursor: pointer;
+  background-color: rgb(30, 38, 48) !important;
   height: 50px;
   margin-left: calc(50% - 25px);
   border-radius: 4px;
   margin-bottom: -20px;
-
 }
 
 .settings-window input:focus {
@@ -820,7 +845,32 @@ header,
 }
 
 .code-blue {
-  background: rgba(23, 31, 255, .2) !important;
+  background: rgba(50, 50, 255, .2) !important;
+}
+
+.misc-data button{
+    padding: 6px;
+}
+
+#badge img {
+    margin-left: 0px;
+    margin-top: 0px;
+}
+
+.unwatch-red {
+  background: rgba(255, 50, 50, .2) !important;
+}
+
+.unwatch-blue {
+  background: rgba(50, 50, 255, .2) !important;
+}
+
+.unwatch-yellow {
+  background: rgba(230, 230, 20, .2) !important;
+}
+
+.unwatch-green {
+  background: rgba(23, 255, 35, .2) !important;
 }
 
 .load-content {
