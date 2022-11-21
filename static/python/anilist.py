@@ -4,6 +4,7 @@ import random
 import time
 import traceback
 import javascript
+from urllib.parse import urlencode
 
 from browser import ajax, bind, document, html, timer, window, worker
 from browser.local_storage import storage
@@ -180,7 +181,10 @@ class HTML:
         
     def badge_out(self):
         badge_url = f"https://roamingcookie.pythonanywhere.com/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}{window.location.search}"
-        current_url = f'https://roamingcookie.github.io/{window.location.search}'
+        
+        parameters = dict(document.query)
+        parameters['user'] = '#' + str(self.data['USER']['id'])
+        current_url = f'https://roamingcookie.github.io/?{urlencode(parameters)}'
         
         html_code = f'''
         <a href="{current_url}"><img src="{badge_url}" alt="@{self.data['USER']['name']} Badge"></a>
@@ -497,6 +501,8 @@ def api_login(event):
     window.location.replace(url)
 
 def err(e):
+    global CALCULATING
+    CALCULATING = False
     document['listout'] <= html.H1('An Exception Has Occurred...') + html.PRE(html.CODE(e))
     return None
 
@@ -617,7 +623,10 @@ try:
         settings(show=True)
 
     if 'user' in document.query:
-        main_handle(None, userName=document.query['user'])
+        user = document.query['user']
+        if isinstance(user, list):
+            user = user[-1]
+        main_handle(None, userName=user)
 
 except:
     err(traceback.format_exc())
