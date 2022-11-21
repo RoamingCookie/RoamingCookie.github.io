@@ -251,8 +251,13 @@ class Tree:
 class Relations:
     def process(self, data):
         flat_data = list(sum(data, []))
+        flat_data.extend(self.custom_relations())
         return self.remove_similar(flat_data)
-
+    
+    def custom_relations(self):
+        with open(os.path.join(CWD, 'static', 'relations.yaml')) as f:
+            return []
+        
     def remove_similar(self, data):
         target_idx = 0
         while target_idx < len(data):
