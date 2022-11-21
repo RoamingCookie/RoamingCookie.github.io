@@ -876,7 +876,13 @@ header,
 .load-content {
   margin-left: calc(50% - 110px);
   padding-right: calc(50% - 120px);
-  margin-top: calc(50%);
+  margin-top: calc(15%);
+}
+
+@media (max-width: 767px) {
+  .load-content {
+    margin-top: calc(50%);
+  }
 }
 
 .lds-ripple {
