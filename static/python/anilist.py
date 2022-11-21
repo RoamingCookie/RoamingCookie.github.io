@@ -551,7 +551,7 @@ def pop_json(jsond):
 
 def main_handle(event, userName=None):
     try:
-        global start, CALCULATING
+        global start, CALCULATING, CUSTOM
     
         document['listout'].html = ''
     
@@ -571,7 +571,7 @@ def main_handle(event, userName=None):
         if user.startswith('#'):
             user = int(user[1:])
 
-        api.send(json.dumps({'user': user, 'KEY': settings()['api'], 'CWD': os.getcwd(), 'CACHE': dict(storage)}))
+        api.send(json.dumps({'user': user, 'KEY': settings()['api'], 'CWD': os.getcwd(), 'CACHE': dict(storage), 'CUSTOM': CUSTOM}))
     except:
         err(traceback.format_exc())
 
@@ -614,7 +614,15 @@ try:
     document["body"].bind('scrol', music_toggle)
     document["login-key-button"].bind('click', api_login)
     document['username-input-box'].bind('keyup', lambda event: main_handle(event) if event.which == 13 else None)
-
+    
+    try:
+        with open(os.path.join(os.getcwd(), 'static', 'relations.yaml')) as f:
+            CUSTOM = window.jsyaml.load(f.read())
+            if not isinstance(CUSTOM, list):
+                CUSTOM = []
+    except:
+        CUSTOM = []
+    
     toggle_css()
 
     if window.location.hash.startswith('#access_token='):
