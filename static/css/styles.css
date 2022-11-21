@@ -164,6 +164,11 @@
   font-weight: bold;
 }
 
+.close img {
+  width: 50px;
+  height: 50px;
+}
+
 .close:hover,
 .close:focus {
   color: #000;

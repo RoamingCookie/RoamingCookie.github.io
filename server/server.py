@@ -132,9 +132,15 @@ def update(userid):
     except Exception:
         return 'Too Many Request', 529
 
-@app.route('/status', methods=['GET'])
-def status():
-    return str(request.remote_addr)
+@app.route('/placeholder/<string:user>', methods=['GET'])
+def status(user):
+    badgeArgs = {}
+    badgeArgs['style'] = 'for-the-badge'
+    badgeArgs['color'] = 'ff69b4'
+    badgeArgs['logo'] = ICON
+    badgeArgs['message'] = 'Watched [LOADING] Anime'
+    badgeArgs['label'] = f'@{user}'
+    return redirect(f'https://img.shields.io/static/v1' + ("?" + urlencode(badgeArgs) if badgeArgs else ''))
 
 @app.after_request
 def after_request(response):

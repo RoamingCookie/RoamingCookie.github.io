@@ -196,13 +196,13 @@ class HTML:
         md_code_element = html.CODE()
         md_code_element.text = md_code
         
-        yield html.CENTER(html.IMG(src=badge_url, Id='badge-image'))
+        yield html.CENTER(html.IMG(src=f"http://roamingcookie.pythonanywhere.com/placeholder/{self.data['USER']['name']}", Id='badge-image'))
 
         yield html.H6('Markdown') + html.PRE(md_code_element, Id='md-code')
 
         yield html.H6('HTML') + html.PRE(html_code_element, Id='html-code')
 
-        yield html.CENTER(html.A('CUSTOMIZE', href='/docs/badge_api'))
+        yield html.CENTER(html.A('CUSTOMIZE', href='/docs/badge_api', target='_blank'))
         
     def unwatch_out(self):
         yield html.TR(
@@ -502,7 +502,6 @@ def err(e):
 
 def sync_server(data):
     def update_badge(response):
-        document['badge-image'].src = ''
         document['badge-image'].src = f"https://roamingcookie.pythonanywhere.com/{'svg' if 'svg' in document.query else 'badge'}/{data['USER']['id']}{window.location.search}"
     
     ajax.post(
