@@ -1,2 +1,18 @@
 # This file contains relations which are abandoned by AniList
+#
+# make a pull-request 
+# and put the AniList media ID of in a list format, 
+# making the full document a "List Of Lists", ie. in this way
+# 
+# - - media_id_1
+#   - media_id_2
+#   - media_id_3
+#
+# - - media_id_4
+#   - media_id_5
+#   - media_id_6
+# 
+# and comment out the name of the anime exactly in the
+# same way written in AniList title (english)
+# for the purpose of humanity
 
