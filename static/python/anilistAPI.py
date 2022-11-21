@@ -17,6 +17,7 @@ except:
 
 CWD: str = 'blob:http://'
 TMP_CACHE: dict = {}
+CUSTOM: list = []
 
 
 class Graphql:
@@ -251,12 +252,8 @@ class Tree:
 class Relations:
     def process(self, data):
         flat_data = list(sum(data, []))
-        flat_data.extend(self.custom_relations())
+        flat_data.extend(CUSTOM)
         return self.remove_similar(flat_data)
-    
-    def custom_relations(self):
-        with open(os.path.join(CWD, 'static', 'relations.yaml')) as f:
-            return []
         
     def remove_similar(self, data):
         target_idx = 0
@@ -451,11 +448,10 @@ def GetUserInfo(user):
 
 
 def main(event):
-    global CWD, TMP_CACHE, API_KEY
+    global CWD, TMP_CACHE, API_KEY, CUSTOM
     if hasattr(event, 'data'):
         event_data = json.loads(event.data)
-        user, CWD, TMP_CACHE, API_KEY = event_data['user'], event_data[
-            'CWD'], event_data['CACHE'], event_data['KEY']
+        user, CWD, TMP_CACHE, API_KEY, CUSTOM = event_data['user'], event_data['CWD'], event_data['CACHE'], event_data['KEY'], event_data['CUSTOM']
 
     else:
         user, CWD, API_KEY = event, os.getcwd() + '/../../', ''
