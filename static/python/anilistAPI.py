@@ -206,6 +206,7 @@ class Tree:
 
     def request_list(self, db):
         rqlist = sum([db] if isinstance(db[-1], int) else db, [])
+        
         self.record.append(rqlist)
         lastPage = True
         currentPage = 0
@@ -241,19 +242,37 @@ class Tree:
         db = [[key] + [iD['id'] for iD in value['relations']]
               for key, value in start.items()]
         self.processData.append(db)
-        z = 0
+       
+        db.extend(CUSTOM)
+        
         while not self.completed:
-            z = z + 1
             res = self.request_list(db)
             db = self.next_db(res)
+            
         return self.processData
 
 
 class Relations:
     def process(self, data):
         flat_data = list(sum(data, []))
-        flat_data.extend(CUSTOM)
+        custom_index = []
+        cdm = self.custom_data_map()
+        
+        flat_out_data = list(sum(flat_data, []))
+        for custom_i in list(sum(CUSTOM, [])):
+            if custom_i in flat_out_data:
+                custom_index.append(cdm[custom_i])
+                
+        flat_data.extend([CUSTOM[i] for i in list(set(custom_index))])
+        
         return self.remove_similar(flat_data)
+    
+    def custom_data_map(self):
+        out = {}
+        for i,v in enumerate(CUSTOM):
+            for n in v:
+                out[n] = i
+        return out
         
     def remove_similar(self, data):
         target_idx = 0
@@ -402,11 +421,11 @@ def GetUserInfo(user):
     if isinstance(user, int):
         user = graphql.request('user', userId=user)['data']['User']['name']
 
-    anime_out, user_info, stopped = graphql.GET(
-        'user lists', userName=user, type='ANIME')
+    anime_out, user_info, stopped = graphql.GET('user lists', userName=user, type='ANIME')
 
     if user_info is None:
         return anime_out, False
+        
     tree_out = tree_gen.get_tree(anime_out)
     proc_out = relation_gen.process(tree_out)
     anime_proc = text_process.display_data(proc_out, list(anime_out), stopped)
@@ -444,6 +463,7 @@ def GetUserInfo(user):
         'UnwatchPlausible': output['USER']['count']['unwatch']['willWatch'],
         'TotalUnwatch': output['USER']['count']['unwatch']['total'],
     }
+    output['CUSTOM'] = CUSTOM
     return output, True
 
 
