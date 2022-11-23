@@ -259,7 +259,7 @@ class Relations:
         cdm = self.custom_data_map()
         
         flat_out_data = list(sum(flat_data, []))
-        window.send(json.dumps({'ERROR': flat_out_data}))
+        
         for custom_i in list(sum(CUSTOM, [])):
             if custom_i in flat_out_data:
                 custom_index.append(cdm[custom_i])
