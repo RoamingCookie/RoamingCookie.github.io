@@ -184,7 +184,7 @@ class HTML:
         )
         
     def badge_out(self):
-        query = {k.lower():v for k,v in dict(document.query)}
+        query = {k.lower():v for k,v in dict(document.query).items()}
         badge_parameters = {
             'svg': query.get('svg', ''),
             'message': query.get('message', ''),
