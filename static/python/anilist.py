@@ -530,6 +530,9 @@ def api_login(event):
 def err(e):
     global CALCULATING
     CALCULATING = False
+    if not CRASH:
+        CRASH = True
+        document['listout'].html = ''
     document['listout'] <= html.H1('An Exception Has Occurred...') + html.PRE(html.CODE(e))
     return None
 
@@ -616,11 +619,11 @@ def display(event):
 
         meme(hide=True)
         data = json.loads(event.data)
-        document['listout'].html = ''
 
         if 'ERROR' in data:
             return err(data['ERROR'])
         
+        document['listout'].html = '' 
         sync_server(data)
         
         dump = HTML(data)
@@ -635,6 +638,7 @@ def display(event):
 
 try:
     SERVER = 'https://cookielist.onrender.com'
+    CRASH = False
     
     document["username-input-button"].bind("click", main_handle)
     document["settings-button"].bind("click", lambda event: settings(show=True))
