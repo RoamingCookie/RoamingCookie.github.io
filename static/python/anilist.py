@@ -184,11 +184,32 @@ class HTML:
         )
         
     def badge_out(self):
-        badge_url = f"{SERVER}/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}{window.location.search}"
+        badge_parameters = {
+            'svg': document.query.get('svg', ''),
+            'message': document.query.get('message', ''),
+            'style': document.query.get('style', ''),
+            'label': document.query.get('label', ''),
+            'logo': document.query.get('logo', ''),
+            'logoColor': document.query.get('logoColor', ''),
+            'logoWidth': document.query.get('logoWidth', ''),
+            'link': document.query.get('link', ''),
+            'labelColor': document.query.get('labelColor', ''),
+            'color': document.query.get('color', ''),
+        }
+        badge_parameters = {k:v for k,v in badge_parameters.items() if v != ''}
         
-        parameters = dict(document.query)
-        parameters['user'] = '#' + str(self.data['USER']['id'])
-        current_url = f'https://roamingcookie.github.io/?{urlencode(parameters)}'
+        site_parameters = {
+            'user': document.query.get('user', ''),
+            'music': document.query.get('music', ''),
+            'css': document.query.get('css', ''),
+        }
+        site_parameters['user'] = '#' + str(self.data['USER']['id'])
+        site_parameters = {k:v for k,v in site_parameters.items() if v != ''}
+        site_parameters.update(badge_parameters)
+        
+        
+        badge_url = f"{SERVER}/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}?{urlencode(badge_parameters)}"
+        current_url = f'https://roamingcookie.github.io/?{urlencode(site_parameters)}'
         
         html_code = f'''
         <a href="{current_url}"><img src="{badge_url}" alt="@{self.data['USER']['name']} Badge"></a>
@@ -210,7 +231,7 @@ class HTML:
 
         yield html.H6('HTML') + html.PRE(html_code_element, Id='html-code')
 
-        yield html.CENTER(html.A('CUSTOMIZE', href='/docs/badge_api', target='_blank'))
+        yield html.CENTER(html.A('CUSTOMIZE LIVE BADGE', href='/docs/badge_api', target='_blank'))
         
     def unwatch_out(self):
         yield html.TR(
