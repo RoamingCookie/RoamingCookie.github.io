@@ -184,7 +184,7 @@ class HTML:
         )
         
     def badge_out(self):
-        badge_url = f"https://roamingcookie.pythonanywhere.com/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}{window.location.search}"
+        badge_url = f"{SERVER}/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}{window.location.search}"
         
         parameters = dict(document.query)
         parameters['user'] = '#' + str(self.data['USER']['id'])
@@ -204,7 +204,7 @@ class HTML:
         md_code_element = html.CODE()
         md_code_element.text = md_code
         
-        yield html.CENTER(html.IMG(src=f"http://roamingcookie.pythonanywhere.com/placeholder/{self.data['USER']['name']}", Id='badge-image'))
+        yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='badge-image'))
 
         yield html.H6('Markdown') + html.PRE(md_code_element, Id='md-code')
 
@@ -259,7 +259,7 @@ class HTML:
         
         document['server-data-view'].bind('click', lambda e, data={str(self.data['USER']['id']): list(self.data['CARD'].values())}: pop_json(data))
         document['relation-rule-data-view'].bind('click', lambda e, data={'Rules': CUSTOM}: pop_json(data))
-        document['live-server-data-view'].bind('click', lambda e: window.open(f"https://roamingcookie.pythonanywhere.com/view/{self.data['USER']['id']}", '_blank').focus())
+        document['live-server-data-view'].bind('click', lambda e: window.open(f"{SERVER}/view/{self.data['USER']['id']}", '_blank').focus())
         document['data-view'].bind('click', lambda e, data=self.data: pop_json(data))
 
         window.hljs.highlightElement(document['md-code'])
@@ -513,10 +513,10 @@ def err(e):
 
 def sync_server(data):
     def update_badge(response):
-        document['badge-image'].src = f"https://roamingcookie.pythonanywhere.com/{'svg' if 'svg' in document.query else 'badge'}/{data['USER']['id']}{window.location.search}"
+        document['badge-image'].src = f"{SERVER}/{'svg' if 'svg' in document.query else 'badge'}/{data['USER']['id']}{window.location.search}"
     
     ajax.post(
-        f'https://roamingcookie.pythonanywhere.com/update/{data["USER"]["id"]}',
+        f'{SERVER}/update/{data["USER"]["id"]}',
         data=json.dumps({data["USER"]["id"]: list(data['CARD'].values())}),
         headers={
             'UserID': str(data["USER"]["id"]), 
@@ -612,6 +612,8 @@ def display(event):
 
 
 try:
+    SERVER = 'https://cookielist.onrender.com'
+    
     document["username-input-button"].bind("click", main_handle)
     document["settings-button"].bind("click", lambda event: settings(show=True))
     document["settings-save"].bind("click", lambda event: settings(save=True))
