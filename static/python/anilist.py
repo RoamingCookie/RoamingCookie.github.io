@@ -184,24 +184,25 @@ class HTML:
         )
         
     def badge_out(self):
+        query = {k.lower():v for k,v in dict(document.query)}
         badge_parameters = {
-            'svg': document.query.get('svg', ''),
-            'message': document.query.get('message', ''),
-            'style': document.query.get('style', ''),
-            'label': document.query.get('label', ''),
-            'logo': document.query.get('logo', ''),
-            'logoColor': document.query.get('logoColor', ''),
-            'logoWidth': document.query.get('logoWidth', ''),
-            'link': document.query.get('link', ''),
-            'labelColor': document.query.get('labelColor', ''),
-            'color': document.query.get('color', ''),
+            'svg': query.get('svg', ''),
+            'message': query.get('message', ''),
+            'style': query.get('style', ''),
+            'label': query.get('label', ''),
+            'logo': query.get('logo', ''),
+            'logoColor': query.get('logoColor', ''),
+            'logoWidth': query.get('logoWidth', ''),
+            'link': query.get('link', ''),
+            'labelColor': query.get('labelColor', ''),
+            'color': query.get('color', ''),
         }
         badge_parameters = {k:v for k,v in badge_parameters.items() if v != ''}
         
         site_parameters = {
-            'user': document.query.get('user', ''),
-            'music': document.query.get('music', ''),
-            'css': document.query.get('css', ''),
+            'user': query.get('user', ''),
+            'music': query.get('music', ''),
+            'css': query.get('css', ''),
         }
         site_parameters['user'] = '#' + str(self.data['USER']['id'])
         site_parameters = {k:v for k,v in site_parameters.items() if v != ''}
