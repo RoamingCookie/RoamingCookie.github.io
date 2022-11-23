@@ -6,12 +6,12 @@ import json
 import base64
 from io import BytesIO
 
-PATH = '/home/RoamingCookie/cookielist'
-URL = 'https://roamingcookie.github.io/'
+PATH = '/'
+URL = 'https://roamingcookie.github.io'
 ICON = 'data:image/svg+xml;base64,' + base64.b64encode(open(os.path.join(PATH, 'image', 'anilist.svg')).read().encode()).decode()
 SVG = open(os.path.join(PATH, 'image', 'default.svg')).read()
 ALLOWED_ADDR = ['https://roamingcookie.github.io', 'https://roamingcookie.github.io/', 'roamingcookie.github.io']
-SELF = 'https://roamingcookie.pythonanywhere.com'
+SELF = 'https://cookielist.onrender.com'
 
 app = Flask(__name__)
 regex = re.compile(r"((?<!\\)\{(?<!\\)&(\s+)?(.*?)(\s+)?(?<!\\)&(?<!\\)\})", re.DOTALL)
