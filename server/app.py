@@ -6,7 +6,7 @@ import json
 import base64
 from io import BytesIO
 
-PATH = '/'
+PATH = ''
 URL = 'https://roamingcookie.github.io'
 ICON = 'data:image/svg+xml;base64,' + base64.b64encode(open(os.path.join(PATH, 'image', 'anilist.svg')).read().encode()).decode()
 SVG = open(os.path.join(PATH, 'image', 'default.svg')).read()
