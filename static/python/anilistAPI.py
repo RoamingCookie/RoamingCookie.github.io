@@ -238,12 +238,14 @@ class Tree:
         else:
             self.completed = True
 
-    def get_tree(self, start):
-        db = [[key] + [iD['id'] for iD in value['relations']]
-              for key, value in start.items()]
+    def get_tree(self, start, flat=False):
+        if not flat:
+            db = [[key] + [iD['id'] for iD in value['relations']]
+                for key, value in start.items()]
+        else:
+            db = start
+        
         self.processData.append(db)
-       
-        db.extend(CUSTOM)
         
         while not self.completed:
             res = self.request_list(db)
@@ -253,18 +255,24 @@ class Tree:
 
 
 class Relations:
+    def __init__(self):
+        self.tree = Tree()
+        
     def process(self, data):
         flat_data = list(sum(data, []))
         custom_index = []
         cdm = self.custom_data_map()
         
         flat_out_data = list(sum(flat_data, []))
-        
         for custom_i in list(sum(CUSTOM, [])):
             if custom_i in flat_out_data:
                 custom_index.append(cdm[custom_i])
-                
-        flat_data.extend([CUSTOM[i] for i in list(set(custom_index))])
+        common = [CUSTOM[i] for i in list(set(custom_index))] 
+        
+        if len(common) != 0:
+            common_relations = self.tree.get_tree(common, flat=True)
+            flat_data.extend(common_relations[-1])
+            flat_data.extend(CUSTOM)
         
         return self.remove_similar(flat_data)
     
@@ -463,6 +471,7 @@ def GetUserInfo(user):
         'UnwatchAiring': output['USER']['count']['unwatch']['airing'],
         'UnwatchPlausible': output['USER']['count']['unwatch']['willWatch'],
         'TotalUnwatch': output['USER']['count']['unwatch']['total'],
+        'LastUpdateTimestamp': time.time(),
     }
     output['CUSTOM'] = CUSTOM
     return output, True
