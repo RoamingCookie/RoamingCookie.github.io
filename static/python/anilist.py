@@ -92,8 +92,8 @@ class HTML:
     
     def unwatch(self):
         yield html.TR(
-            html.TD(html.B('Anime Title'))
-          + html.TD(html.B('Format/Status'))
+            html.TD(html.B('Format/Status'))
+          + html.TD(html.B('Anime Title'))
           + html.TD(html.B('ID')),
         )
         
@@ -107,17 +107,17 @@ class HTML:
             if not media['watched']:
                 yield html.TR(
                     html.TD(
+                        html.CODE(
+                            media['format'],
+                            Class='unwatch-' + self.gscolor(media),
+                        )
+                    )
+                  + html.TD(
                         html.A(
                             media['title'],
                             href=media['url'],
                             target='_blank',
                         ),
-                    )
-                  + html.TD(
-                        html.CODE(
-                            media['format'],
-                            Class='unwatch-' + self.gscolor(media),
-                        )
                     )
                   + html.TD(
                         html.CODE(
@@ -528,7 +528,7 @@ def api_login(event):
     window.location.replace(url)
 
 def err(e):
-    global CALCULATING
+    global CALCULATING, CRASH 
     CALCULATING = False
     if not CRASH:
         CRASH = True
