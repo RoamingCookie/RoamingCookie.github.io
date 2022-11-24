@@ -637,7 +637,7 @@ def display(event):
 
 
 try:
-    SERVER = 'https://cookielist.onrender.com'
+    SERVER = 'https://roamingcookie.pythonanywhere.com' # cookielist.onrender.com
     CRASH = False
     
     document["username-input-button"].bind("click", main_handle)
