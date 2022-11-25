@@ -3,6 +3,7 @@ import json
 import os
 import time
 import traceback
+import base64
 from datetime import datetime
 
 try:
