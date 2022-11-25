@@ -238,7 +238,7 @@ class HTML:
         svg_md_code_element = html.CODE()
         svg_md_code_element.text = svg_md_code
         
-        yield html.CENTER(html.H2('You can put these in your AniList Bio...'))
+        yield html.CENTER(html.H2('Use these inside your AniList Bio\'s'))
         yield html.HR()
         
         yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='badge-image'))
