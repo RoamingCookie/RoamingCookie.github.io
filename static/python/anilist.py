@@ -238,13 +238,16 @@ class HTML:
         svg_md_code_element = html.CODE()
         svg_md_code_element.text = svg_md_code
         
+        yield html.CENTER(html.H2('You can put these in your AniList Bio...'))
+        yield html.HR()
+        
         yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='badge-image'))
         yield html.H6('Markdown') + html.PRE(md_code_element, Id='md-code')
         yield html.H6('HTML') + html.PRE(html_code_element, Id='html-code')
         
         yield html.HR()
         
-        yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='svg_badge-image'))
+        yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='svg_badge-image', width="100%"))
         yield html.H6('Markdown') + html.PRE(svg_md_code_element, Id='svg_md-code')
         yield html.H6('HTML') + html.PRE(svg_html_code_element, Id='svg_html-code')
  
