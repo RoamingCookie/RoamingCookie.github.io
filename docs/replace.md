@@ -1,41 +1,40 @@
 # Data Replace Guide
 
-replaces the following text which matches this regex (DOTALL and CASEINSENSETIVE enabled)
-
-```regex
-((?<!\\)\{(?<!\\)&(\s+)?(.*?)(\s+)?(?<!\\)&(?<!\\)\})
-```
-
-ie. in this format `{& VARIABLE_NAME &}` every thing between `{&` and `&}`
-
+enables JINJA with the following variables
 these can be put inside `/badge?message=` and `/svg?svg=` [endpoints](/docs/endpoint.md)
 
 these variables are suported
 
-```{& UserId &}```   -   AniList ID of the user
+```{{ UserId }}```   -   AniList ID of the user
 
-```{& UserName &}```   -   AniList User Name of the user
+```{{ UserName }}```   -   AniList User Name of the user
 
-```{& UserSiteUrl &}```   -   users anilist profile link
+```{{ UserSiteUrl }}```   -   users anilist profile link
 
-```{& UserAvatar &}```   -   anilist user avatar
+```{{ UserAvatar }}```   -   anilist user avatar
 
-```{& AnimeWatched &}```   -   total number of anime watched (calculated)
+```{{ UserAvatarB64 }}```   -   base64 encoded UserAvatar image to use inside SVG data uri image
 
-```{& TitleWatched &}```   -   number of titles watched (displayed on anilist)
+```{{ AnimeWatched }}```   -   total number of anime watched (calculated)
 
-```{& EpisodeWatched &}```   -   number of episodes watched
+```{{ TitleWatched }}```   -   number of titles watched (displayed on anilist)
 
-```{& MinutesWatched &}```   -   minutes watched
+```{{ EpisodeWatched }}```   -   number of episodes watched
 
-```{& WatchTime &}```   -   watch time (formated to days or hours accordingly)
+```{{ MinutesWatched }}```   -   minutes watched
 
-```{& UnwatchDropped &}```   -   unwatched anime series (in accordance to series watched) which are marked as dropped
+```{{ WatchTime }}```   -   watch time (formated to days or hours accordingly)
 
-```{& UnwatchNotReleased &}```   -   unwatched anime series (in accordance to series watched) which are not released yet
+```{{ UnwatchDropped }}```   -   unwatched anime series (in accordance to series watched) which are marked as dropped
 
-```{& UnwatchAiring &}```   -   unwatched anime series (in accordance to series watched) which are marked as dropped
+```{{ UnwatchNotReleased }}```   -   unwatched anime series (in accordance to series watched) which are not released yet
 
-```{& UnwatchPlausible &}```   -   unwatched anime series (in accordance to series watched) which are either not in list or marked as planning
+```{{ UnwatchAiring }}```   -   unwatched anime series (in accordance to series watched) which are marked as dropped
 
-```{& TotalUnwatch &}```   -   total number of unwatched anime series (in accordance to series watched)
+```{{ UnwatchPlausible }}```   -   unwatched anime series (in accordance to series watched) which are either not in list or marked as planning
+
+```{{ TotalUnwatch }}```   -   total number of unwatched anime series (in accordance to series watched)
+
+```{{ LastUpdateTimestamp }}```   -   timestamp of when the data at server were updated last
+
+```{{ LastUpdated }}```   -   LastUpdateTimestamp but formated to human readable format
