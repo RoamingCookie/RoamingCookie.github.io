@@ -1,5 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="90" width="200">
-  <text x="10" y="20" style="fill:red;">{& userName &}
-    <tspan x="10" y="45">{& COU NT &}.ggg {& COUNTT &} </tspan>
-  </text>
+{% macro stats(name, value, level) -%}
+    <text font-size="14px" font-family="sans-serif" fill="#666666" stroke="#666666" x="220" y="{{ 40 + (30 * level) }}" stroke-width="1">{{ name }}: {{ value }}</text>
+{%- endmacro %}
+
+{% macro percentage(value, color) -%}
+    <path stroke-linecap="round" d="M 90 30 a 80 80 0 0 1 0 160 a 80 80 0 0 1 0 -160" fill="none" stroke="#{{ color }}" stroke-width="12" stroke-dasharray="{{ value }}, 500" /> 
+{%- endmacro %}
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="455" height="225">
+    <style>
+        .shadow {
+            filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.7));
+        }
+        .circle {
+            animation: progress 1.5s ease-out forwards;
+        }
+        @keyframes progress {
+            0% {
+                stroke-dasharray: 0 500;
+            }
+        }
+    </style>
+    
+    {% set TotalUnwatch_ = (TotalUnwatch / TotalUnwatch) * 500 %}
+    {% set UnwatchAiring_ = (UnwatchAiring / TotalUnwatch) * 500 %}
+    {% set UnwatchDropped_ = (UnwatchDropped / TotalUnwatch) * 500 %}
+    {% set UnwatchNotReleased_ = (UnwatchNotReleased / TotalUnwatch) * 500 %}
+    {% set UnwatchPlausible_ = (UnwatchPlausible / TotalUnwatch) * 500 %}
+    
+    <g class="shadow">
+        <rect fill="rgb(248, 248, 255)" stroke="none" class="card" x="90" y="10" rx="9" ry="9" width="350" height="200" />
+        
+        {{ percentage(TotalUnwatch_ + UnwatchAiring_ +  UnwatchDropped_ + UnwatchNotReleased_ + UnwatchPlausible_, "eeeeee") }}
+        {{ percentage(UnwatchAiring_ +  UnwatchDropped_ + UnwatchNotReleased_ + UnwatchPlausible_, "4CC790") }}
+        {{ percentage(UnwatchDropped_ + UnwatchNotReleased_ + UnwatchPlausible_, "3c9ee5") }}
+        {{ percentage(UnwatchNotReleased_ + UnwatchPlausible_, "e1e85f") }}
+        {{ percentage(UnwatchPlausible_, "eb3434") }}
+        
+        <image x="10" y="30" width="160" height="160" clip-path="inset(5px round 50%)" xlink:href="data:image/png;base64,{{ UserAvatarB64 }}"/>
+    </g>
+    
+    <text font-size="24px" font-family="sans-serif" fill="#3c9ee5" stroke="#3c9ee5" x="180" y="40">@{{ UserName }}</text>
+    
+    {{ stats("Anime Watched", AnimeWatched, 1) }}
+    {{ stats("Title Watched", TitleWatched, 2) }}
+    {{ stats("Episode Watched", EpisodeWatched, 3) }}
+    {{ stats("Watch Time", WatchTime, 4) }}
+    
+    <text font-size="10px" font-family="sans-serif" fill="#cccccc" stroke="#cccccc" x="325" y="205">Updated {{ LastUpdated }} ago</text>
 </svg>
