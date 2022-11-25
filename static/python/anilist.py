@@ -209,29 +209,45 @@ class HTML:
         site_parameters.update(badge_parameters)
         
         
-        badge_url = f"{SERVER}/{'svg' if 'svg' in document.query else 'badge'}/{self.data['USER']['id']}?{urlencode(badge_parameters)}"
+        badge_url = f"{SERVER}/badge/{self.data['USER']['id']}?{urlencode(badge_parameters)}"
+        svg_badge_url = f"{SERVER}/svg/{self.data['USER']['id']}?{urlencode(badge_parameters)}"
+        
         current_url = f'https://roamingcookie.github.io/?{urlencode(site_parameters)}'
         
         html_code = f'''
         <a href="{current_url}"><img src="{badge_url}" alt="@{self.data['USER']['name']} Badge"></a>
         '''.strip()
-
         md_code = f'''
         [![@{self.data['USER']['name']} Badge]({badge_url})]({current_url})
+        '''.strip()
+        
+        svg_html_code = f'''
+        <a href="{current_url}"><img src="{svg_badge_url}" alt="@{self.data['USER']['name']} Badge"></a>
+        '''.strip()
+        svg_md_code = f'''
+        [![@{self.data['USER']['name']} Badge]({svg_badge_url})]({current_url})
         '''.strip()
 
         html_code_element = html.CODE()
         html_code_element.text = html_code
-
         md_code_element = html.CODE()
         md_code_element.text = md_code
         
+        svg_html_code_element = html.CODE()
+        svg_html_code_element.text = svg_html_code
+        svg_md_code_element = html.CODE()
+        svg_md_code_element.text = svg_md_code
+        
         yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='badge-image'))
-
         yield html.H6('Markdown') + html.PRE(md_code_element, Id='md-code')
-
         yield html.H6('HTML') + html.PRE(html_code_element, Id='html-code')
-
+        
+        yield html.HR()
+        
+        yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='svg_badge-image'))
+        yield html.H6('Markdown') + html.PRE(svg_md_code_element, Id='svg_md-code')
+        yield html.H6('HTML') + html.PRE(svg_html_code_element, Id='svg_html-code')
+ 
         yield html.CENTER(html.A('CUSTOMIZE LIVE BADGE', href='/docs/badge_api', target='_blank'))
         
     def unwatch_out(self):
@@ -286,6 +302,9 @@ class HTML:
 
         window.hljs.highlightElement(document['md-code'])
         window.hljs.highlightElement(document['html-code'])
+        
+        window.hljs.highlightElement(document['svg_md-code'])
+        window.hljs.highlightElement(document['svg_html-code'])
         
     def listout_header(self):
         return html.DIV(
@@ -538,7 +557,8 @@ def err(e):
 
 def sync_server(data):
     def update_badge(response):
-        document['badge-image'].src = f"{SERVER}/{'svg' if 'svg' in document.query else 'badge'}/{data['USER']['id']}{window.location.search}"
+        document['badge-image'].src = f"{SERVER}/badge/{data['USER']['id']}{window.location.search}"
+        document['svg_badge-image'].src = f"{SERVER}/svg/{data['USER']['id']}{window.location.search}" 
     
     ajax.post(
         f'{SERVER}/update/{data["USER"]["id"]}',

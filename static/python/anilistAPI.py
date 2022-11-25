@@ -3,7 +3,6 @@ import json
 import os
 import time
 import traceback
-import base64
 from datetime import datetime
 
 try:
@@ -424,7 +423,7 @@ class Processor:
                 first_iD, out[first_iD])
         return out
 
-def imgbase64(url):
+def base64(url):
     out = []
     ajax.get(
         url,
@@ -471,7 +470,7 @@ def GetUserInfo(user):
         'UserName': output['USER']['name'],
         'UserSiteUrl': output['USER']['url'],
         'UserAvatar': output['USER']['avatar'],
-        'UserAvatarB64': imgbase64(output['USER']['avatar']),
+        'UserAvatarB64': base64(output['USER']['avatar']),
         'AnimeWatched': output['USER']['count']['anime'],
         'TitleWatched': output['USER']['count']['title'],
         'EpisodeWatched': output['USER']['count']['episode'],
