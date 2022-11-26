@@ -391,7 +391,7 @@ def settings(close=False, show=False, save=False, get=True, api_key=False):
     else:
         SETTINGS = {
             'api': '',
-            'music': True,
+            'music': False,
             'css': True,
             'spoiler': False,
             'nsfw': False,
