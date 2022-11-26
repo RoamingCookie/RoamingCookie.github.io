@@ -3,7 +3,6 @@ import json
 import os
 import time
 import traceback
-import base64
 from datetime import datetime
 
 try:
@@ -424,16 +423,6 @@ class Processor:
                 first_iD, out[first_iD])
         return out
 
-def img_base64(url):
-    out = []
-    ajax.get(
-        url,
-        blocking=True,
-        mode="binary",
-        oncomplete=out.append
-    )
-    return base64.b64encode(out[-1].read()).decode()
-
 def GetUserInfo(user):
     graphql, tree_gen, relation_gen, text_process = Graphql(), Tree(), Relations(), Processor()
 
@@ -471,7 +460,7 @@ def GetUserInfo(user):
         'UserName': output['USER']['name'],
         'UserSiteUrl': output['USER']['url'],
         'UserAvatar': output['USER']['avatar'],
-        'UserAvatarB64': img_base64(output['USER']['avatar']),
+        'UserAvatarB64': None,
         'AnimeWatched': output['USER']['count']['anime'],
         'TitleWatched': output['USER']['count']['title'],
         'EpisodeWatched': output['USER']['count']['episode'],

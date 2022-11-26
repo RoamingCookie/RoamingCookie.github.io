@@ -5,6 +5,7 @@ import time
 import traceback
 import javascript
 from urllib.parse import urlencode
+import base64
 
 from browser import ajax, bind, document, html, timer, window, worker
 from browser.local_storage import storage
@@ -562,6 +563,15 @@ def sync_server(data):
     def update_badge(response):
         document['badge-image'].src = f"{SERVER}/badge/{data['USER']['id']}{window.location.search}"
         document['svg_badge-image'].src = f"{SERVER}/svg/{data['USER']['id']}{window.location.search}" 
+    
+    response = []
+    ajax.get(
+        data['USER']['avatar'],
+        blocking=True,
+        mode="binary",
+        oncomplete=response.append
+    )
+    data['CARD']['UserAvatarB64'] = base64.b64encode(response[-1].read()).decode()
     
     ajax.post(
         f'{SERVER}/update/{data["USER"]["id"]}',
