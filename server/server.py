@@ -162,6 +162,11 @@ def status(user):
     badgeArgs['label'] = f'@{user}'
     return redirect(f'https://img.shields.io/static/v1' + ("?" + urlencode(badgeArgs) if badgeArgs else ''))
 
+@app.route('/users', methods=['GET'])
+def users():
+    user_html = list(map(lambda user: f'<br><a href="https://anilist.co/user/{user}" target="_blank"><img width="100%" src="{SELF}/svg/{user}"></a>', map(lambda name: name[:-5], sorted(filter(lambda name: name.endswith('.json'), os.listdir(os.path.join(PATH, 'count'))), key=lambda name: os.path.getmtime(os.path.join(PATH, 'count', name)), reverse=True))))
+    return ''.join(['<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>', f'<center><font face="sans-serif" color="#666666"><h1>{len(user_html)} Users</h1></font></center>', *user_html, '</html></body>'])
+    
 @app.after_request
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
