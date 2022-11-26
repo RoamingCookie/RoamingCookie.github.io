@@ -12,7 +12,7 @@
             filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.7));
         }
         .circle {
-            animation: progress 1.5s ease-out forwards;
+            animation: progress 3s ease-out forwards;
         }
         @keyframes progress {
             0% {
