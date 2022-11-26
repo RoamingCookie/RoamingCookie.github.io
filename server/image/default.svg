@@ -3,7 +3,7 @@
 {%- endmacro %}
 
 {% macro percentage(value, color) -%}
-    <path stroke-linecap="round" d="M 90 30 a 80 80 0 0 1 0 160 a 80 80 0 0 1 0 -160" fill="none" stroke="#{{ color }}" stroke-width="12" stroke-dasharray="{{ value }}, 500" /> 
+    <path class="circle" stroke-linecap="round" d="M 90 30 a 80 80 0 0 1 0 160 a 80 80 0 0 1 0 -160" fill="none" stroke="#{{ color }}" stroke-width="12" stroke-dasharray="{{ value }}, 500" /> 
 {%- endmacro %}
 
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="455" height="225">
