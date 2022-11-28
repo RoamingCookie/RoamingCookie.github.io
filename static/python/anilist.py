@@ -382,10 +382,41 @@ class HTML:
         )
         
         for ID, media in media_data.items():
-            document[f'C{ID}'].bind('click', input)
+            anilist_co = media['url']
+            zoro_to = 'https://zoro.to/search?' + urlencode({'keyword': media['title']})
+            _pop_up_click_bind(f'C{ID}', anilist_co, zoro_to)
 
         modal_window.style.display = 'block'
 
+class _pop_up_click_bind:
+    def __init__(self, Id, click_url, dbclick_url):
+        self.dom = document[Id]
+        
+        self.prevent_click = False
+        self.delay = 250
+        self.timer = 0
+        
+        self.anilist_co = click_url
+        self.zoro_to = dbclick_url
+        
+        self.dom.bind('click', self.click_timer)
+        self.dom.bind('dblclick', self.dblclick)
+    
+    def click_timer(self, event):
+        self.timer = timer.set_timeout(self.click, self.delay)
+        
+    def open_link(self, url):
+        window.open(url, '_blank').focus()
+        
+    def click(self):
+        if not self.prevent_click:
+            self.open_link(self.anilist_co)
+        self.prevent_click = False
+        
+    def dblclick(self, event):
+        timer.clear_timeout(self.timer)
+        self.prevent_click = True
+        self.open_link(self.zoro_to)
 
 def settings(close=False, show=False, save=False, get=True, api_key=False):
     if 'SETTINGS' in storage:
