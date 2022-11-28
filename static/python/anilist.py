@@ -366,7 +366,7 @@ class HTML:
         modal_image.html = ''
         modal_image <= html.DIV(
             html.SPAN(
-                html.A(
+                html.SPAN(
                     html.DIV(
                         html.IMG(
                             src=media['cover'],
@@ -376,11 +376,13 @@ class HTML:
                         ('' if media['watched'] else (
                             ' grayscale gscolor-' + self.gscolor(media))),
                     ),
-                    href=media['url'],
-                    target="_blank",
+                    Id=f'C{ID}',
                 ),
             ) for ID, media in media_data.items()
         )
+        
+        for ID, media in media_data.items():
+            document[f'C{ID}'].bind('click', input)
 
         modal_window.style.display = 'block'
 
