@@ -4,7 +4,7 @@ enables JINJA with the following variables
 these can be put inside `/badge?message=` and `/svg?svg=` [endpoints](/docs/endpoint.md)
 
 these variables are suported
-
+{% raw %}
 ```{{ UserId }}```   -   AniList ID of the user
 
 ```{{ UserName }}```   -   AniList User Name of the user
@@ -38,3 +38,5 @@ these variables are suported
 ```{{ LastUpdateTimestamp }}```   -   timestamp of when the data at server were updated last
 
 ```{{ LastUpdated }}```   -   LastUpdateTimestamp but formated to human readable format
+
+{% endraw %}
