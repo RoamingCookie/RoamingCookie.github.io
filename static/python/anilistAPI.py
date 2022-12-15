@@ -213,7 +213,7 @@ class Tree:
         self.processData = []
 
     def request_list(self, db):
-        if not len(db):
+        if not len(db) == 0:
             rqlist = sum([db] if isinstance(db[-1], int) else db, [])
         else:
             rqlist = []
