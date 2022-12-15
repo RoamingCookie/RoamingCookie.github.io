@@ -17,6 +17,10 @@ query ($userId: Int, $userName: String, $type: MediaType) {
           minutesWatched
           episodesWatched
         }
+        manga {
+          count
+          chaptersRead
+        }
       }
       avatar {
         large
