@@ -115,8 +115,10 @@ class HTML:
             if key != lkey:
                 yield html.SPAN('', Class='br-span')
         
-        lkey = list(self.manga)[-1]
-        yield html.H1('Manga')
+        if len(self.manga) != 0:
+            lkey = list(self.manga)[-1]
+            yield html.H1('Manga')
+            
         for key, value in self.manga.items():
             yield html.H6(f'{key} - {len(self.manga[key])}')
             yield html.UL(
@@ -190,19 +192,20 @@ class HTML:
                     ) 
                 )
                 
-        yield html.TR(
-            html.TD(html.H1('Manga'))
-          + html.TD('')
-          + html.TD('')
-          + html.TD('')
-        )
-        
-        yield html.TR(
-            html.TD(html.B('Format/Status'))
-          + html.TD(html.B('Manga Title'))
-          + html.TD(html.B('ID'))
-          + html.TD(html.B('mangareader.to')),
-        )
+        if len(self.manga) != 0:
+            yield html.TR(
+                html.TD(html.H1('Manga'))
+              + html.TD('')
+              + html.TD('')
+              + html.TD('')
+            )
+            
+            yield html.TR(
+                html.TD(html.B('Format/Status'))
+              + html.TD(html.B('Manga Title'))
+              + html.TD(html.B('ID'))
+              + html.TD(html.B('mangareader.to')),
+            )
         
         media_s = []
         for series in self.data['DATA']['MANGA'].values():
