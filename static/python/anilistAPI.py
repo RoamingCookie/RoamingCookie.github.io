@@ -213,8 +213,11 @@ class Tree:
         self.processData = []
 
     def request_list(self, db):
-        rqlist = sum([db] if isinstance(db[-1], int) else db, [])
-        
+        if not len(db):
+            rqlist = sum([db] if isinstance(db[-1], int) else db, [])
+        else:
+            rqlist = []
+            
         self.record.append(rqlist)
         lastPage = True
         currentPage = 0
