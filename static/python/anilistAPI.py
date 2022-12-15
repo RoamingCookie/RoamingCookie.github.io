@@ -18,6 +18,7 @@ except:
 CWD: str = 'blob:http://'
 TMP_CACHE: dict = {}
 CUSTOM: list = []
+MANGA: bool = False
 
 
 class Graphql:
@@ -52,6 +53,8 @@ class Graphql:
             -NOVEL
             -ONE_SHOT
         ''')
+        if MANGA:
+            self.AllowedFormats = ['MANGA', 'NOVEL', 'ONE_SHOT']
 
         self.AllowedStatus = allowed_string_format('''
             FINISHED
@@ -168,15 +171,20 @@ class Graphql:
                     })
                 )
             return response, None, None
+        
+        completed_status = ('COMPLETED', 'REPEATING')
+        uncompleted_stats = ('CURRENT', 'DROPPED', 'PAUSED')
+        
+        for al in response['data']['MediaListCollection']['lists']:
+            if al['status'] in completed_status:
+                watchedRaw.extend([media for media in al['entries'] if media['media']['format'] in self.AllowedFormats])
 
         for al in response['data']['MediaListCollection']['lists']:
-            if al['status'] in ('COMPLETED', 'REPEATING'):
-                watchedRaw.extend(al['entries'])
-
-        for al in response['data']['MediaListCollection']['lists']:
-            if al['status'] in ('CURRENT', 'DROPPED', 'PAUSED'):
+            if al['status'] in uncompleted_stats:
                 stopped_watching.extend([media['media']['id']
-                                        for media in al['entries']])
+                                        for media in al['entries']
+                                        if media['media']['format'] in self.AllowedRelations
+                                        ])
 
         for media in watchedRaw:
             media = media['media']
@@ -309,6 +317,8 @@ class Processor:
             'TV': 'S',
             'TV_SHORT': 'SHORT',
             'SPECIAL': 'SPE',
+            'ONE_SHOT': 'PILOT',
+            'NOVEL': 'LN',
         }
         self.stat_norm = lambda stat: '-'.join(
             [self.abbreviation.get(k, k) + str(v) for k, v in stat.items()])
@@ -329,7 +339,7 @@ class Processor:
         sort = sorted(entry, key=self.series_sort_func)
         default_iD = sort[0]
         for iD in sort:
-            if self.cache[iD]['format'] == 'TV':
+            if self.cache[iD]['format'] == ('TV' if not MANGA else 'NOVEL'):
                 return iD, sort
         return default_iD, sort
 
@@ -423,23 +433,45 @@ class Processor:
                 first_iD, out[first_iD])
         return out
 
-def GetUserInfo(user):
-    graphql, tree_gen, relation_gen, text_process = Graphql(), Tree(), Relations(), Processor()
 
+def data_handler_builder(user):
+    global MANGA
     if isinstance(user, int):
         user = graphql.request('user', userId=user)['data']['User']['name']
 
+    graphql, tree_gen, relation_gen, text_process = Graphql(), Tree(), Relations(), Processor()
     anime_out, user_info, stopped = graphql.GET('user lists', userName=user, type='ANIME')
-
     if user_info is None:
         return anime_out, False
-        
     tree_out = tree_gen.get_tree(anime_out)
     proc_out = relation_gen.process(tree_out)
     anime_proc = text_process.display_data(proc_out, list(anime_out), stopped)
-
-    output = {}
     
+    MANGA = True
+    
+    graphql, tree_gen, relation_gen, text_process = Graphql(), Tree(), Relations(), Processor()
+    manga_out, user_info, stopped = graphql.GET('user lists', userName=user, type='MANGA')
+    if user_info is None:
+        return anime_out, False
+    tree_out = tree_gen.get_tree(manga_out)
+    proc_out = relation_gen.process(tree_out)
+    manga_proc = text_process.display_data(proc_out, list(manga_out), stopped)
+    
+    return {
+        'user_info': user_info,
+        'anime_proc': anime_proc,
+        'manga_proc': manga_proc
+    }
+
+def GetUserInfo(user):
+    data = data_handler_builder(user)
+    
+    user_info = data['user_info']
+    anime_proc = data['anime_proc']
+    manga_proc = data['manga_proc']
+    
+    text_process = Processor()
+    output = {}
     output['USER'] = {
         'id': user_info['id'],
         'name': user_info['name'],
@@ -447,13 +479,21 @@ def GetUserInfo(user):
         'avatar': user_info['avatar']['large'],
         'count': {
             'anime': len(anime_proc),
+            'manga': len(manga_proc),
             'unwatch': text_process.unwatch_stat(anime_proc),
+            'unread': text_process.unwatch_stat(manga_proc),
             'title': user_info['statistics']['anime']['count'],
+            'headings': user_info['statistics']['manga']['count'],
             'episode': user_info['statistics']['anime']['episodesWatched'],
-            'time': (lambda min: {'formated': str(round(min / (60 if min < (24 * 60) else 60 * 24), 1)) + (" Hour's" if min < (24 * 60) else " Day's"), 'raw': min})(user_info["statistics"]["anime"]["minutesWatched"]),
+            'chapter': user_info['statistics']['manga']['chaptersRead'],
+            'watchtime': (lambda min: {'formated': str(round(min / (60 if min < (24 * 60) else 60 * 24), 1)) + (" Hour's" if min < (24 * 60) else " Day's"), 'raw': min})(user_info["statistics"]["anime"]["minutesWatched"]),
+            'readtime': (lambda min: {'formated': str(round(min / (60 if min < (24 * 60) else 60 * 24), 1)) + (" Hour's" if min < (24 * 60) else " Day's"), 'raw': min})(5.6 * user_info['statistics']['manga']['chaptersRead']),
         },
     }
-    output['DATA'] = anime_proc
+    output['DATA'] = {
+        'ANIME': anime_proc,
+        'MANGA': manga_proc
+    }
     output['CACHE'] = TMP_CACHE
     output['CARD'] = {
         'UserId': output['USER']['id'],
@@ -462,15 +502,25 @@ def GetUserInfo(user):
         'UserAvatar': output['USER']['avatar'],
         'UserAvatarB64': None,
         'AnimeWatched': output['USER']['count']['anime'],
+        'MangaRead': output['USER']['count']['manga'],
         'TitleWatched': output['USER']['count']['title'],
+        'TitleRead': output['USER']['count']['headings'],
         'EpisodeWatched': output['USER']['count']['episode'],
-        'MinutesWatched': output['USER']['count']['time']['raw'],
-        'WatchTime': output['USER']['count']['time']['formated'],
+        'ChaptersRead': output['USER']['count']['chapter'],
+        'MinutesWatched': output['USER']['count']['watchtime']['raw'],
+        'MinutesRead': output['USER']['count']['readtime']['raw'],
+        'WatchTime': output['USER']['count']['watchtime']['formated'],
+        'ReadTime': output['USER']['count']['readtime']['formated'],
         'UnwatchDropped': output['USER']['count']['unwatch']['dropped'],
+        'UnReadDropped': output['USER']['count']['unread']['dropped'],
         'UnwatchNotReleased': output['USER']['count']['unwatch']['notReleased'],
+        'UnReadNotReleased': output['USER']['count']['unread']['notReleased'],
         'UnwatchAiring': output['USER']['count']['unwatch']['airing'],
+        'UnReadAiring': output['USER']['count']['unread']['airing'],
         'UnwatchPlausible': output['USER']['count']['unwatch']['willWatch'],
+        'UnReadPlausible': output['USER']['count']['unread']['willWatch'],
         'TotalUnwatch': output['USER']['count']['unwatch']['total'],
+        'TotalUnRead': output['USER']['count']['unread']['total'],
         'LastUpdateTimestamp': time.time(),
     }
     output['CUSTOM'] = CUSTOM

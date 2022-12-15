@@ -30,7 +30,7 @@ class HTML:
         dictionary = ('0', list('abcdefghijklmnopqrstuvwxyz'))
         self.anime = {key.upper(): dict()
                       for key in [dictionary[0]] + dictionary[1]}
-        for iD, media in data['DATA'].items():
+        for iD, media in data['DATA']['ANIME'].items():
             title_key = media[iD]['title'][0].upper()
             if not title_key in self.anime:
                 title_key = dictionary[0]
@@ -42,6 +42,21 @@ class HTML:
             else:
                 self.anime[key] = dict(sorted(value.items(), key=lambda k: k[1][k[0]]['title'].lower()))
                 
+                
+        self.manga = {key.upper(): dict()
+                      for key in [dictionary[0]] + dictionary[1]}
+        for iD, media in data['DATA']['MANGA'].items():
+            title_key = media[iD]['title'][0].upper()
+            if not title_key in self.manga:
+                title_key = dictionary[0]
+            self.manga[title_key][iD] = media
+            
+        for key, value in self.manga.copy().items():
+            if not value:
+                del self.manga[key]
+            else:
+                self.manga[key] = dict(sorted(value.items(), key=lambda k: k[1][k[0]]['title'].lower()))
+       
     def code_status(self, extra_data):
         if not extra_data['completed'] and extra_data['available'] and not extra_data['willWatch'] and extra_data['outThere']:
             return 'code-blue'
@@ -57,21 +72,30 @@ class HTML:
             html.TR(
                 html.TD(html.IMG(src=user['avatar']))
                 + html.TD(html.H3('Anime Watched'))
-                + html.TD(html.H3('Title Count'))
-                + html.TD(html.H3('Episode Count'))
-                + html.TD(html.H3('Watch Time')),
+                + html.TD(html.H3('Manga Read'))
+                + html.TD(html.H3('Anime Title Count'))
+                + html.TD(html.H3('Manga Title Count'))
+                + html.TD(html.H3('Episode Watch Count'))
+                + html.TD(html.H3('Chapters Read Count')) 
+                + html.TD(html.H3('Anime Watch Time'))
+                + html.TD(html.H3('Manga Read Time')), 
             )
             + html.TR(
                 html.TD(html.H4(html.A('@' + user['name'], href=user['url'])))
                 + html.TD(html.H4(count['anime']))
+                + html.TD(html.H4(count['manga']))
                 + html.TD(html.H4(count['title']))
+                + html.TD(html.H4(count['headings']))
                 + html.TD(html.H4(count['episode']))
-                + html.TD(html.H4(count['time']['formated'])),
+                + html.TD(html.H4(count['chapter']))
+                + html.TD(html.H4(count['watchtime']['formated']))
+                + html.TD(html.H4(count['readtime']['formated'])), 
             )
         )
 
     def list_out(self):
         lkey = list(self.anime)[-1]
+        yield html.H1('Anime')
         for key, value in self.anime.items():
             yield html.H6(f'{key} - {len(self.anime[key])}')
             yield html.UL(
@@ -89,17 +113,46 @@ class HTML:
                 ) for media_id, media in value.items()
             )
             if key != lkey:
-                yield html.SPAN(html.BR(), Class='br-span')
-    
+                yield html.SPAN('', Class='br-span')
+        
+        lkey = list(self.manga)[-1]
+        yield html.H1('Manga')
+        for key, value in self.manga.items():
+            yield html.H6(f'{key} - {len(self.manga[key])}')
+            yield html.UL(
+                html.SPAN(
+                    html.LI(
+                        html.EM(
+                            media[media_id]['title']
+                        ) + html.STRONG(' - ') + html.CODE(
+                            media[media_id]['extra']['stat']['formated'],
+                            Class='stat-box ' +
+                            self.code_status(media[media_id]['extra']),
+                            Id=media_id,
+                        ),
+                    ),
+                ) for media_id, media in value.items()
+            )
+            if key != lkey:
+                yield html.SPAN('', Class='br-span')
+        
     def unwatch(self):
+        yield html.TR(
+            html.TD(html.H1('Anime'))
+          + html.TD('')
+          + html.TD('')
+          + html.TD('')
+        )
+        
         yield html.TR(
             html.TD(html.B('Format/Status'))
           + html.TD(html.B('Anime Title'))
-          + html.TD(html.B('ID')),
+          + html.TD(html.B('ID'))
+          + html.TD(html.B('zoro.to')),
         )
         
         media_s = []
-        for series in self.data['DATA'].values():
+        for series in self.data['DATA']['ANIME'].values():
             for media in series.values():
                 media_s.append(media)
         
@@ -124,7 +177,70 @@ class HTML:
                         html.CODE(
                             media['id'],
                         )
-                    ),
+                    )
+                  + html.TD(
+                        html.A(
+                            html.BUTTON(
+                                html.IMG(src="/static/image/zoro.to.png", width='25px'),
+                                Class='button-30'
+                            ),
+                            href='https://zoro.to/search?' + urlencode({'keyword': media['title']}),
+                            target='_blank',
+                        ),
+                    ) 
+                )
+                
+        yield html.TR(
+            html.TD(html.H1('Manga'))
+          + html.TD('')
+          + html.TD('')
+          + html.TD('')
+        )
+        
+        yield html.TR(
+            html.TD(html.B('Format/Status'))
+          + html.TD(html.B('Manga Title'))
+          + html.TD(html.B('ID'))
+          + html.TD(html.B('mangareader.to')),
+        )
+        
+        media_s = []
+        for series in self.data['DATA']['MANGA'].values():
+            for media in series.values():
+                media_s.append(media)
+        
+        media_s = sorted(media_s, key=lambda k: k['title'])
+        for media in media_s:
+            if not media['watched']:
+                yield html.TR(
+                    html.TD(
+                        html.CODE(
+                            media['format'],
+                            Class='unwatch-' + self.gscolor(media),
+                        )
+                    )
+                  + html.TD(
+                        html.A(
+                            media['title'],
+                            href=media['url'],
+                            target='_blank',
+                        ),
+                    )
+                  + html.TD(
+                        html.CODE(
+                            media['id'],
+                        )
+                    )
+                  + html.TD(
+                        html.A(
+                            html.BUTTON(
+                                html.IMG(src="/static/image/mangareader.to.png", width='25px'),
+                                Class='button-30'
+                            ),
+                            href='https://mangareader.to/search?' + urlencode({'keyword': media['title']}),
+                            target='_blank',
+                        ),
+                    )
                 )
     
     def misc_out(self):
@@ -159,7 +275,7 @@ class HTML:
         
     def dump_data(self):
         yield self.listout_header()
-        yield html.DIV(html.H1(f"@{self.data['USER']['name']} Watched {self.data['USER']['count']['anime']} Anime"), Class="output")
+        yield html.DIV(html.H1(f"@{self.data['USER']['name']} Watched {self.data['USER']['count']['anime']} Anime & Read {self.data['USER']['count']['manga']} Manga"), Class="output")
         yield html.BR()
         yield html.DIV(self.stat_out(), Class="stats")
         yield html.BR()
@@ -167,9 +283,9 @@ class HTML:
         yield html.BR()
         yield html.TABLE(self.misc_out(), Class="output misc-data")
         yield html.BR()
-        yield html.TABLE(self.unwatch_out(), Class="output")
+        yield html.CENTER(html.TABLE(self.unwatch_out(), Class="output"))
         yield html.BR()
-        yield html.TABLE(self.unwatch(), Class="output unwatch-list")
+        yield html.CENTER(html.TABLE(self.unwatch(), Class="output unwatch-list"))
         yield html.BR()
         yield html.DIV(self.badge_out(), Class="output")
         yield html.BR()
@@ -198,6 +314,11 @@ class HTML:
             'labelColor': query.get('labelColor', ''),
             'color': query.get('color', ''),
         }
+        
+        for k,v in query.items():
+            if k.startswith('jinja_'):
+                badge_parameters[k] = v
+                
         badge_parameters = {k:v for k,v in badge_parameters.items() if v != ''}
         
         site_parameters = {
@@ -248,7 +369,7 @@ class HTML:
         
         yield html.HR()
         
-        yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='svg_badge-image', width="100%"))
+        yield html.CENTER(html.IMG(src=f"{SERVER}/placeholder/{self.data['USER']['name']}", Id='svg_badge-image'))
         yield html.H6('Markdown') + html.PRE(svg_md_code_element, Id='svg_md-code')
         yield html.H6('HTML') + html.PRE(svg_html_code_element, Id='svg_html-code')
  
@@ -256,28 +377,52 @@ class HTML:
         
     def unwatch_out(self):
         yield html.TR(
-            html.TD(html.B('Unwatched Anime'))
-          + html.TD(html.B('Count')),
+            html.TD(html.B('Category'))
+          + html.TD('')
+          + html.TD(html.B('Anime'))
+          + html.TD('')
+          + html.TD(html.B('Manga'))
+          + html.TD(''),
         )
         yield html.TR(
             html.TD('Dropped/Paused')
-          + html.TD(self.data['CARD']['UnwatchDropped']),
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnwatchDropped'])
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnReadDropped'])
+          + html.TD(''),
         )
         yield html.TR(
             html.TD('Not Released')
-          + html.TD(self.data['CARD']['UnwatchNotReleased']),
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnwatchNotReleased'])
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnReadNotReleased'])
+          + html.TD(''),
         )
         yield html.TR(
             html.TD('Airing')
-          + html.TD(self.data['CARD']['UnwatchAiring']),
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnwatchAiring'])
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnReadAiring'])
+          + html.TD(''),
         )
         yield html.TR(
             html.TD('Plausible')
-          + html.TD(self.data['CARD']['UnwatchPlausible']),
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnwatchPlausible'])
+          + html.TD('')
+          + html.TD(self.data['CARD']['UnReadPlausible'])
+          + html.TD(''),
         )
         yield html.TR(
             html.TD('Total')
-          + html.TD(self.data['CARD']['TotalUnwatch']),
+          + html.TD('')
+          + html.TD(self.data['CARD']['TotalUnwatch'])
+          + html.TD('')
+          + html.TD(self.data['CARD']['TotalUnRead'])
+          + html.TD(''),
         )
     
     def bind_modal(self):
@@ -291,9 +436,13 @@ class HTML:
             if event.target == modal_window:
                 modal_window.style.display = 'none'
 
-        for element in self.data['DATA']:
+        for element in self.data['DATA']['ANIME']:
             document[element].bind('click', lambda event,
                                    element=element: self.make_popup(element))
+        
+        for element in self.data['DATA']['MANGA']:
+            document[element].bind('click', lambda event,
+                                   element=element: self.make_popup(element, manga=True))
 
         modal_close.bind('click', fn_modal_close)
 
@@ -335,9 +484,9 @@ class HTML:
     def leftout_media(self, iD):
         if iD in self.cache:
             return self.cache[iD]
-        watched_media = len([media for media in self.data["DATA"]
-                            [iD] if self.data["DATA"][iD][media]["watched"]])
-        total_media = len(self.data["DATA"][iD])
+        watched_media = len([media for media in self.data["DATA"]['ANIME']
+                            [iD] if self.data["DATA"]['ANIME'][iD][media]["watched"]])
+        total_media = len(self.data["DATA"]['ANIME'][iD])
         self.cache[iD] = (
             watched_media,
             total_media,
@@ -355,11 +504,11 @@ class HTML:
         else:
             return 'yellow'
 
-    def make_popup(self, iD):
+    def make_popup(self, iD, manga=False):
         modal_title = document['modal-title-id']
         modal_image = document['modal-image-id']
         modal_window = document['modal-window']
-        media_data = self.data['DATA'][iD]
+        media_data = self.data['DATA']['ANIME' if not manga else 'MANGA'][iD]
 
         modal_title.text = f"{media_data[iD]['title']} ({media_data[iD]['extra']['watchedCount']}/{media_data[iD]['extra']['totalCount']})"
 
@@ -383,8 +532,8 @@ class HTML:
         
         for ID, media in media_data.items():
             anilist_co = media['url']
-            zoro_to = 'https://zoro.to/search?' + urlencode({'keyword': media['title']})
-            _pop_up_click_bind(f'C{ID}', anilist_co, zoro_to)
+            external = f'https://{"mangareader" if manga else "zoro"}.to/search?' + urlencode({'keyword': media['title']})
+            _pop_up_click_bind(f'C{ID}', anilist_co, external)
 
         modal_window.style.display = 'block'
 
@@ -397,7 +546,7 @@ class _pop_up_click_bind:
         self.timer = 0
         
         self.anilist_co = click_url
-        self.zoro_to = dbclick_url
+        self.external = dbclick_url
         
         self.dom.bind('click', self.click_timer)
         self.dom.bind('dblclick', self.dblclick)
@@ -416,7 +565,7 @@ class _pop_up_click_bind:
     def dblclick(self, event):
         timer.clear_timeout(self.timer)
         self.prevent_click = True
-        self.open_link(self.zoro_to)
+        self.open_link(self.external)
 
 def settings(close=False, show=False, save=False, get=True, api_key=False):
     if 'SETTINGS' in storage:
