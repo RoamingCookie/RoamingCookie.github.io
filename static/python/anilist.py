@@ -852,7 +852,7 @@ def display(event):
 
 
 try:
-    SERVER = 'https://roamingcookie.pythonanywhere.com' # cookielist.onrender.com
+    SERVER = 'https://roamingcookie.pythonanywhere.com'
     CRASH = False
     
     document["username-input-button"].bind("click", main_handle)

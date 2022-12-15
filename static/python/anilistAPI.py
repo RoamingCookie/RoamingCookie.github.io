@@ -13,7 +13,7 @@ try:
 except:
     import requests
     WEB = False
-    CACHE = 24 * 60 * 60
+    CACHE = 0
 
 CWD: str = 'blob:http://'
 TMP_CACHE: dict = {}
@@ -436,10 +436,12 @@ class Processor:
 
 def data_handler_builder(user):
     global MANGA
+    
+    MANGA = False
+    
+    graphql, tree_gen, relation_gen, text_process = Graphql(), Tree(), Relations(), Processor() 
     if isinstance(user, int):
         user = graphql.request('user', userId=user)['data']['User']['name']
-
-    graphql, tree_gen, relation_gen, text_process = Graphql(), Tree(), Relations(), Processor()
     anime_out, user_info, stopped = graphql.GET('user lists', userName=user, type='ANIME')
     if user_info is None:
         return anime_out, False
@@ -456,6 +458,8 @@ def data_handler_builder(user):
     tree_out = tree_gen.get_tree(manga_out)
     proc_out = relation_gen.process(tree_out)
     manga_proc = text_process.display_data(proc_out, list(manga_out), stopped)
+    
+    MANGA = False
     
     return {
         'user_info': user_info,
@@ -532,9 +536,8 @@ def main(event):
     if hasattr(event, 'data'):
         event_data = json.loads(event.data)
         user, CWD, TMP_CACHE, API_KEY, CUSTOM = event_data['user'], event_data['CWD'], event_data['CACHE'], event_data['KEY'], event_data['CUSTOM']
-
     else:
-        user, CWD, API_KEY = event, os.getcwd() + '/../../', ''
+        user, CWD, API_KEY = event, os.getcwd() + '', ''
 
     if WEB:
         try:
