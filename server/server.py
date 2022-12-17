@@ -14,6 +14,7 @@ ICON = 'data:image/svg+xml;base64,' + base64.b64encode(open(os.path.join(PATH, '
 SVG = open(os.path.join(PATH, 'image', 'default.svg')).read()
 ALLOWED_ADDR = ['https://roamingcookie.github.io', 'https://roamingcookie.github.io/', 'roamingcookie.github.io']
 SELF = 'https://roamingcookie.pythonanywhere.com'
+MAINTENANCE = False
 
 app = Flask(__name__)
 regex = re.compile(r"((?<!\\)\{(?<!\\)&(\s+)?(.*?)(\s+)?(?<!\\)&(?<!\\)\})", re.DOTALL)
@@ -33,15 +34,25 @@ def get_data(userid, data, parameter=True):
         'UserAvatar',
         'UserAvatarB64',
         'AnimeWatched',
+        'MangaRead',
         'TitleWatched',
+        'TitleRead',
         'EpisodeWatched',
+        'ChaptersRead',
         'MinutesWatched',
+        'MinutesRead',
         'WatchTime',
+        'ReadTime',
         'UnwatchDropped',
+        'UnReadDropped',
         'UnwatchNotReleased',
+        'UnReadNotReleased',
         'UnwatchAiring',
+        'UnReadAiring',
         'UnwatchPlausible',
+        'UnReadPlausible',
         'TotalUnwatch',
+        'TotalUnRead',
         'LastUpdateTimestamp',
     ]
     if parameter and data:
@@ -89,15 +100,18 @@ def view(userid):
 
 @app.route('/badge/<string:userid>', methods=['GET'])
 def badge(userid):
+    if MAINTENANCE:
+        return redirect(f'{SELF}/maintenance')
     data = get_data(userid, request.args.get('data', {}))
     badgeArgs = {}
 
     badgeArgs['style'] = 'for-the-badge'
     badgeArgs['color'] = 'ff69b4'
     badgeArgs['logo'] = ICON
-    badgeArgs['message'] = 'Watched {{ AnimeWatched }} Anime'
+    badgeArgs['message'] = 'Anime: {{ AnimeWatched }} | Manga: {{ MangaRead }}'
     badgeArgs['label'] = data.get('UserName', '')
-
+    badgeArgs['link'] = f'https://anilist.co/user/{userid}'
+    
     if not data:
         badgeArgs['label'] = 'You need to at least once visit'
         badgeArgs['message'] = f'{URL}?user=%23{userid}'
@@ -115,6 +129,9 @@ def badge(userid):
 
 @app.route('/svg/<string:userid>', methods=['GET'])
 def svg(userid):
+    if MAINTENANCE:
+        return redirect(f'{SELF}/maintenance')
+    jinja_data = {k[5:]:v for k,v in dict(request.args).items() if k.startswith('jinja_')}
     data = get_data(userid, request.args.get('data', {}))
     svgdata = request.args.get('svg', SVG)
     if svgdata == 'default':
@@ -162,10 +179,25 @@ def status(user):
     badgeArgs['label'] = f'@{user}'
     return redirect(f'https://img.shields.io/static/v1' + ("?" + urlencode(badgeArgs) if badgeArgs else ''))
 
+@app.route('/maintenance', methods=['GET'])
+def maintenance():
+    badgeArgs = {}
+    badgeArgs['style'] = 'for-the-badge'
+    badgeArgs['color'] = 'f71631'
+    badgeArgs['logo'] = ICON
+    badgeArgs['message'] = 'server is under a maintenance break'
+    badgeArgs['label'] = 'MAINTENANCE'
+    return redirect(f'https://img.shields.io/static/v1' + ("?" + urlencode(badgeArgs) if badgeArgs else ''))
+
 @app.route('/users', methods=['GET'])
 def users():
-    user_html = list(map(lambda user: f'<br><a href="https://anilist.co/user/{user}" target="_blank"><img width="100%" src="{SELF}/svg/{user}"></a>', map(lambda name: name[:-5], sorted(filter(lambda name: name.endswith('.json'), os.listdir(os.path.join(PATH, 'count'))), key=lambda name: os.path.getmtime(os.path.join(PATH, 'count', name)), reverse=True))))
+    user_html = list(map(lambda user: f'<br><a href="https://anilist.co/user/{user}" target="_blank"><object type="image/svg+xml" data="{SELF}/badge/{user}?jinja_b64=false"></object></a><br>', map(lambda name: name[:-5], sorted(filter(lambda name: name.endswith('.json'), os.listdir(os.path.join(PATH, 'count'))), key=lambda name: os.path.getmtime(os.path.join(PATH, 'count', name)), reverse=True))))
     return ''.join(['<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>', f'<center><font face="sans-serif" color="#666666"><h1>{len(user_html)} Users</h1></font></center>', *user_html, '</html></body>'])
+    
+@app.route('/userids', methods=['GET'])
+def userids():
+    data = list(map(lambda user: str(user), map(lambda name: name[:-5], sorted(filter(lambda name: name.endswith('.json'), os.listdir(os.path.join(PATH, 'count'))), key=lambda name: os.path.getmtime(os.path.join(PATH, 'count', name)), reverse=True))))
+    return jsonify({'users': data})
     
 @app.after_request
 def after_request(response):
