@@ -668,7 +668,7 @@ def meme(memes=None, toggle=None, hide=False):
     count = 30
     if memes is None:
         ajax.get(
-            f'https://meme-api.herokuapp.com/gimme/{random.choice(subreddits)}/{count}',
+            f'https://meme-api.com/gimme/{random.choice(subreddits)}/{count}',
             mode="json",
             oncomplete=meme,
         )
