@@ -6,7 +6,7 @@ import time
 import traceback
 from datetime import datetime
 
-sys.setrecursionlimit(10**6)
+sys.setrecursionlimit(10**12)
 
 try:
     from browser import ajax
