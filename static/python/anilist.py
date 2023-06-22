@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import random
 import time
 import traceback
@@ -10,6 +11,7 @@ import base64
 from browser import ajax, bind, document, html, timer, window, worker
 from browser.local_storage import storage
 
+sys.setrecursionlimit(10**6) 
 
 class HTML:
     def __init__(self, data):
