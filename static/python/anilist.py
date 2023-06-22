@@ -11,7 +11,7 @@ import base64
 from browser import ajax, bind, document, html, timer, window, worker
 from browser.local_storage import storage
 
-sys.setrecursionlimit(10**6) 
+sys.setrecursionlimit(10**12) 
 
 class HTML:
     def __init__(self, data):
