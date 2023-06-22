@@ -1,9 +1,12 @@
 import hashlib
 import json
 import os
+import sys
 import time
 import traceback
 from datetime import datetime
+
+sys.setrecursionlimit(10**6)
 
 try:
     from browser import ajax
