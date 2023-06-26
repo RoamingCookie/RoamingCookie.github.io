@@ -549,7 +549,6 @@ def main(event):
         try:
             data, send = GetUserInfo(user)
             if send:
-                print(json.dumps(data))
                 window.send(json.dumps(data))
         except Exception as exception:
             error = traceback.format_exc()
