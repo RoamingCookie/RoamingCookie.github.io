@@ -17,12 +17,12 @@ class HTML:
     def __init__(self, data):
         self.data = data
         self.cache = {}
-
+        print(11)
         for cache_id, cache_data in data['CACHE'].items():
             if cache_id != 'SETTINGS':
                 storage[cache_id] = json.dumps(cache_data) if isinstance(
                     cache_data, str) else cache_data
-        
+        print(12)
         for cache_id, cache_data in data['CACHE'].items():
             try:
                 data['CACHE'][cache_id] = json.loads(data['CACHE'][cache_id])
@@ -32,6 +32,7 @@ class HTML:
         dictionary = ('0', list('abcdefghijklmnopqrstuvwxyz'))
         self.anime = {key.upper(): dict()
                       for key in [dictionary[0]] + dictionary[1]}
+        print(13)
         for iD, media in data['DATA']['ANIME'].items():
             title_key = media[iD]['title'][0].upper()
             if not title_key in self.anime:
@@ -44,21 +45,22 @@ class HTML:
             else:
                 self.anime[key] = dict(sorted(value.items(), key=lambda k: k[1][k[0]]['title'].lower()))
                 
-                
+        print(14)        
         self.manga = {key.upper(): dict()
                       for key in [dictionary[0]] + dictionary[1]}
+        print(15)
         for iD, media in data['DATA']['MANGA'].items():
             title_key = media[iD]['title'][0].upper()
             if not title_key in self.manga:
                 title_key = dictionary[0]
             self.manga[title_key][iD] = media
-            
+        print(16)
         for key, value in self.manga.copy().items():
             if not value:
                 del self.manga[key]
             else:
                 self.manga[key] = dict(sorted(value.items(), key=lambda k: k[1][k[0]]['title'].lower()))
-       
+        print(17)
     def code_status(self, extra_data):
         if not extra_data['completed'] and extra_data['available'] and not extra_data['willWatch'] and extra_data['outThere']:
             return 'code-blue'
@@ -279,6 +281,7 @@ class HTML:
         )
         
     def dump_data(self):
+        print(20)
         yield self.listout_header()
         yield html.DIV(html.H1(f"@{self.data['USER']['name']} Watched {self.data['USER']['count']['anime']} Anime & Read {self.data['USER']['count']['manga']} Manga"), Class="output")
         yield html.BR()
@@ -850,7 +853,7 @@ def display(event):
         
         document['listout'].html = '' 
         sync_server(data)
-        
+        print(10)
         dump = HTML(data)
         print(1)
         document['listout'] <= html.DIV(dump.dump_data())
