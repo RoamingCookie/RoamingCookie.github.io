@@ -755,10 +755,11 @@ def err(e):
     return None
 
 def sync_server(data):
+    print(32)
     def update_badge(response):
         document['badge-image'].src = f"{SERVER}/badge/{data['USER']['id']}{window.location.search}"
         document['svg_badge-image'].src = f"{SERVER}/svg/{data['USER']['id']}{window.location.search}" 
-    
+    print(33)
     response = []
     ajax.get(
         data['USER']['avatar'],
@@ -766,8 +767,9 @@ def sync_server(data):
         mode="binary",
         oncomplete=response.append
     )
+    print(34)
     data['CARD']['UserAvatarB64'] = base64.b64encode(response[-1].read()).decode()
-    
+    print(35)
     ajax.post(
         f'{SERVER}/update/{data["USER"]["id"]}',
         data=json.dumps({data["USER"]["id"]: list(data['CARD'].values())}),
@@ -777,6 +779,7 @@ def sync_server(data):
         },
         oncomplete=update_badge,
     )
+    print(36)
 
 def pop_json(jsond):
     json_window_modal = document['json-window-modal']
@@ -850,8 +853,9 @@ def display(event):
         print(data)
         if 'ERROR' in data:
             return err(data['ERROR'])
-        
+        print(30)
         document['listout'].html = '' 
+        print(31)
         sync_server(data)
         print(10)
         dump = HTML(data)
