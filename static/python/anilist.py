@@ -768,7 +768,13 @@ def sync_server(data):
         oncomplete=response.append
     )
     print(34)
-    data['CARD']['UserAvatarB64'] = base64.b64encode(response[-1].read()).decode()
+    image_data = response[-1].read()
+    print(40)
+    image_data = base64.b64encode(image_data)
+    print(41)
+    image_data = image_data.decode() 
+    print(42)
+    data['CARD']['UserAvatarB64'] = image_data 
     print(35)
     ajax.post(
         f'{SERVER}/update/{data["USER"]["id"]}',
@@ -850,7 +856,7 @@ def display(event):
 
         meme(hide=True)
         data = json.loads(event.data)
-        print(data)
+        #print(data)
         if 'ERROR' in data:
             return err(data['ERROR'])
         print(30)
