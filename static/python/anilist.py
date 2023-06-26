@@ -769,6 +769,8 @@ def sync_server(data):
     )
     print(34)
     image_data = response[-1].read()
+    print(image_data)
+    print(response[-1])
     print(40)
     image_data = base64.b64encode(image_data)
     print(41)
