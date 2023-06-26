@@ -282,18 +282,22 @@ class HTML:
         yield self.listout_header()
         yield html.DIV(html.H1(f"@{self.data['USER']['name']} Watched {self.data['USER']['count']['anime']} Anime & Read {self.data['USER']['count']['manga']} Manga"), Class="output")
         yield html.BR()
+        print(2)
         yield html.DIV(self.stat_out(), Class="stats")
         yield html.BR()
         yield html.DIV(self.list_out(), Class="output")
         yield html.BR()
+        print(3)
         yield html.TABLE(self.misc_out(), Class="output misc-data")
         yield html.BR()
         yield html.CENTER(html.TABLE(self.unwatch_out(), Class="output"))
         yield html.BR()
+        print(4)
         yield html.CENTER(html.TABLE(self.unwatch(), Class="output unwatch-list"))
         yield html.BR()
         yield html.DIV(self.badge_out(), Class="output")
         yield html.BR()
+        print(5)
         yield html.CENTER(
             html.IMG(src="/static/image/made-with-python.svg")
           + html.BR()
@@ -304,6 +308,7 @@ class HTML:
           + html.IMG(src="/static/image/powered-by-electricity.svg"),
             Id='badge',
         )
+        print(6)
         
     def badge_out(self):
         query = {k.lower():v for k,v in dict(document.query).items()}
@@ -839,7 +844,7 @@ def display(event):
 
         meme(hide=True)
         data = json.loads(event.data)
-
+        print(data)
         if 'ERROR' in data:
             return err(data['ERROR'])
         
@@ -847,7 +852,7 @@ def display(event):
         sync_server(data)
         
         dump = HTML(data)
-
+        print(1)
         document['listout'] <= html.DIV(dump.dump_data())
         dump.bind_modal()
 
